@@ -66,7 +66,7 @@
       overflow-x: auto; scrollbar-width: none; flex-shrink: 0;
     }
     #tabs::-webkit-scrollbar { display: none; }
-    .tab { padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(0,0,0,0.08); background: white; cursor: pointer; font-size: 0.75em; font-weight: 700; white-space: nowrap; color: var(--muted); transition: all .2s ease; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+    .tab { padding: 6px 14px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.08); background: white; cursor: pointer; font-size: 0.75em; font-weight: 700; white-space: nowrap; color: var(--muted); transition: all .2s ease; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
     .tab:hover { border-color: rgba(0,0,0,0.15); color: #2d2a26; transform: translateY(-1px); }
     .tab.on { font-weight: 700; border-color: transparent; color: white; }
     [data-d=all].on { background: linear-gradient(135deg, #0ea5e9, #06b6d4); box-shadow: 0 2px 12px rgba(14,165,233,0.4); }
@@ -78,7 +78,8 @@
     [data-d=sun].on { background: var(--d-sun); box-shadow: 0 2px 12px rgba(234,179,8,0.4); }
     .tab-divider { width:1px; height:20px; background:rgba(0,0,0,0.12); margin:0 4px; align-self:center; flex-shrink:0; }
     .tab-label { font-size:0.65em; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; padding:0 6px; align-self:center; }
-    [data-d=food].on,[data-d=hana].on { background: var(--teal); border-color: transparent; color: white; box-shadow: 0 2px 12px rgba(20,184,166,0.4); }
+    [data-d=food].on { background: #e07a5f; border-color: transparent; color: white; box-shadow: 0 2px 12px rgba(224,122,95,0.4); }
+    [data-d=hana].on { background: #22c55e; border-color: transparent; color: white; box-shadow: 0 2px 12px rgba(34,197,94,0.4); }
 
     /* ── MAIN AREA (list + map) ── */
     #mw { flex: 1; display: flex; overflow: hidden; position: relative; }
@@ -572,7 +573,8 @@
       [data-d=sun].on { background: var(--d-sun); }
       .tab-divider { background: var(--bdr); }
       .tab-label { color: var(--muted); }
-      [data-d=food].on,[data-d=hana].on { background: var(--teal); color: white; }
+      [data-d=food].on { background: #e07a5f; color: white; }
+      [data-d=hana].on { background: #22c55e; color: white; }
 
       #lp { background: rgba(30,45,58,0.96); border-right-color: var(--bdr); }
       @media (max-width: 720px) { #lp.open { box-shadow: 4px 0 24px rgba(0,0,0,0.6); } }
@@ -980,19 +982,23 @@ const HANA_DEFAULTS = [
   { name:"Return — Dinner: Zippy's", desc:"7:30 PM · Back to Kihei ~5:30 PM. Hawaii comfort food" }
 ];
 
-function loadLocal() {
-  const sv = localStorage.getItem('mw_acts2');
-  const st = localStorage.getItem('mw_travelers');
+function loadFoodAndHana() {
   const fg = localStorage.getItem('mw_foodGuide');
   const rth = localStorage.getItem('mw_roadToHana');
-  const lu = localStorage.getItem('mw_listUpdates');
-  if (st) { try { travelers = JSON.parse(st); } catch(e){} }
-  if (lu) { try { listUpdates = JSON.parse(lu); } catch(e){} }
   if (fg) { try { foodGuide = JSON.parse(fg); } catch(e){} }
   const fgEmpty = !(foodGuide.breakfast?.length || foodGuide.lunch?.length || foodGuide.sweets?.length || foodGuide.bookAsap?.length);
   if (fgEmpty) foodGuide = JSON.parse(JSON.stringify(FOOD_GUIDE_DEFAULTS));
   if (rth) { try { roadToHana = JSON.parse(rth); } catch(e){} }
   if (!roadToHana.length) roadToHana = HANA_DEFAULTS.map((h,i)=>({...h, confirmed:i===7}));
+}
+
+function loadLocal() {
+  const sv = localStorage.getItem('mw_acts2');
+  const st = localStorage.getItem('mw_travelers');
+  const lu = localStorage.getItem('mw_listUpdates');
+  if (st) { try { travelers = JSON.parse(st); } catch(e){} }
+  if (lu) { try { listUpdates = JSON.parse(lu); } catch(e){} }
+  loadFoodAndHana();
   if (sv) { try { acts = JSON.parse(sv); } catch(e) { acts = {}; } }
   if (!Object.keys(acts).length) {
     SEED.forEach(s => { acts[s.id] = {...s, status:'approved', approvals:{}, notes:{}}; });
@@ -1885,6 +1891,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   initMap();
 
+  loadFoodAndHana();
   const fbOk = initFB();
   if (fbOk) { setupFBListeners(); }
   else if (FIREBASE_CONFIG.apiKey !== 'YOUR_API_KEY') { localMode=true; loadLocal(); }
