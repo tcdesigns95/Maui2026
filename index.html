@@ -171,34 +171,22 @@
     .li-save:hover { background: rgba(129,178,154,0.4); }
     .li-cancel { padding: 4px 10px; border-radius: 6px; background: rgba(212,196,168,0.06); border: 1px solid var(--bdr); color: var(--muted); font-size: 0.72em; cursor: pointer; }
 
-    /* Card action row */
-    .li-actions { display: flex; gap: 5px; padding: 0 12px 10px; }
-    .li-act-btn { flex: 1; padding: 5px; border-radius: 7px; font-size: 0.68em; font-weight: 600; cursor: pointer; border: 1px solid var(--bdr); background: rgba(255,255,255,0.05); color: var(--muted); transition: all .12s; }
-    .li-act-btn:hover { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.85); }
-    .li-act-btn.del { background: rgba(255,107,53,0.08); color: var(--sugg); border-color: rgba(255,107,53,0.22); }
-    .li-act-btn.del:hover { background: rgba(255,107,53,0.2); }
-
     .sugg-badge { font-size: 0.58em; background: rgba(224,122,95,0.2); color: var(--coral); border: 1px solid rgba(224,122,95,0.4); border-radius: 6px; padding: 1px 5px; font-weight: 700; }
 
     /* ── ACTIVITY GUIDE (schedule-style: lp-day-group) ── */
     .ag-section { padding: 4px 0; }
     .ag-list { list-style: none; padding: 0; margin: 0; }
     .lp-day-body .ag-item {
-      display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px;
-      border-bottom: 1px solid rgba(0,0,0,0.08); font-size: 0.8em; color: #333;
-      background: white; transition: background .15s;
+      display: flex; border-bottom: 1px solid rgba(0,0,0,0.08); font-size: 0.8em; color: #333;
+      background: white;
     }
     .lp-day-body .ag-item:last-child { border-bottom: none; }
     .lp-day-body .ag-item:hover { background: rgba(0,0,0,0.02); }
     .ag-bullet { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); flex-shrink: 0; margin-top: 6px; }
     .ag-item-txt { flex: 1; line-height: 1.4; }
-    .ag-remove { width: 22px; height: 22px; border-radius: 50%; background: rgba(239,68,68,0.15); border: none; color: #dc2626; font-size: 1em; cursor: pointer; flex-shrink: 0; line-height: 1; display: flex; align-items: center; justify-content: center; }
-    .ag-remove:hover { background: rgba(239,68,68,0.25); }
     .ag-hana-list { list-style: none; padding: 0; margin: 0; }
     .ag-hana-item {
-      display: flex; align-items: flex-start; gap: 10px;
-      padding: 10px 12px; padding-right: 40px;
-      border-bottom: 1px solid rgba(0,0,0,0.08); background: white;
+      display: flex; border-bottom: 1px solid rgba(0,0,0,0.08); background: white;
     }
     .ag-hana-item:last-child { border-bottom: none; }
     .ag-hana-check {
@@ -210,7 +198,26 @@
     .ag-hana-main { flex: 1; min-width: 0; }
     .ag-hana-title { font-size: 0.85em; font-weight: 700; color: #1a1a1a; margin-bottom: 2px; cursor: pointer; line-height: 1.3; }
     .ag-hana-desc { font-size: 0.78em; color: #555; line-height: 1.4; }
-    .ag-remove-hana { position: absolute; top: 50%; right: 12px; transform: translateY(-50%); }
+
+    /* ── SWIPE ROW (reveal delete/edit on swipe left) ── */
+    .swipe-row { overflow: hidden; position: relative; display: flex; width: 100%; }
+    .swipe-content { flex: 1; min-width: 100%; transition: transform 0.2s ease; background: inherit; }
+    .swipe-row.revealed .swipe-content { transform: translateX(-100px); }
+    .ag-item.swipe-row .swipe-content { display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px; }
+    .ag-hana-item.swipe-row .swipe-content { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; }
+    .swipe-actions {
+      position: absolute; right: 0; top: 0; bottom: 0; display: flex; flex-shrink: 0;
+      width: 100px; background: rgba(0,0,0,0.03);
+    }
+    .swipe-btn {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      border: none; font-size: 0.75em; font-weight: 700; cursor: pointer;
+      min-width: 50px; color: white;
+    }
+    .swipe-btn.edit { background: #14b8a6; }
+    .swipe-btn.edit:hover { background: #0d9488; }
+    .swipe-btn.delete { background: #dc2626; }
+    .swipe-btn.delete:hover { background: #b91c1c; }
 
     /* ── MAP WRAPPER ── */
     #mw-r { flex: 1; position: relative; overflow: hidden; }
@@ -350,11 +357,11 @@
       .li-name { font-size: 0.95em; white-space: normal; line-height: 1.3; color: #1a1a1a; }
       .li-time { font-size: 0.75em; color: var(--muted); margin-bottom: 2px; }
       /* Hide note & actions on mobile cards — tap opens detail */
-      .li-note, .li-note-editor, .li-actions { display: none !important; }
+      .li-note, .li-note-editor { display: none !important; }
       .li-tag, .sugg-badge { font-size: 0.65em; padding: 2px 6px; }
 
       /* Road to Hana: simple, readable on mobile */
-      .ag-hana-item { padding: 12px 16px 12px 16px; padding-right: 44px; }
+      .ag-hana-item.swipe-row .swipe-content { padding: 12px 16px; }
       .ag-hana-check { width: 24px; height: 24px; font-size: 1em; }
       .ag-hana-title { font-size: 0.9em; line-height: 1.35; }
       .ag-hana-desc { font-size: 0.8em; margin-top: 4px; }
@@ -1252,28 +1259,30 @@ function renderLP() {
       const col = sugg ? '#e07a5f' : (DC[a.day] || '#7eb8da');
       const active = curId === a.id ? ' active' : '';
       html += `
-        <div class="li${active}" id="li-${a.id}">
-          <div class="li-top" onclick="selectActivity('${a.id}')">
-            <div class="li-num" style="background:${col};box-shadow:0 0 8px ${col}60">${sugg ? '?' : dayNum[a.id]}</div>
-            <div class="li-info">
-              <div class="li-time">${esc(a.time)}</div>
-              <div class="li-name">${esc(a.name)}</div>
+        <div class="li swipe-row${active}" id="li-${a.id}">
+          <div class="swipe-content">
+            <div class="li-top" onclick="selectActivity('${a.id}')">
+              <div class="li-num" style="background:${col};box-shadow:0 0 8px ${col}60">${sugg ? '?' : dayNum[a.id]}</div>
+              <div class="li-info">
+                <div class="li-time">${esc(a.time)}</div>
+                <div class="li-name">${esc(a.name)}</div>
+              </div>
+              ${sugg ? `<span class="sugg-badge">💡</span>` : `<span class="li-tag t-${a.tag}">${tagEmoji(a.tag)}</span>`}
             </div>
-            ${sugg ? `<span class="sugg-badge">💡</span>` : `<span class="li-tag t-${a.tag}">${tagEmoji(a.tag)}</span>`}
-          </div>
-          <div class="li-note ${a.note ? 'has-note' : ''}" onclick="toggleNoteEditor('${a.id}');event.stopPropagation()">
-            ${a.note ? esc(a.note) : '<em style="color:var(--muted);font-size:0.9em">+ add note…</em>'}
-          </div>
-          <div class="li-note-editor" id="ne-${a.id}">
-            <textarea class="li-note-ta" id="neta-${a.id}" placeholder="Add notes, tips, costs…" rows="3">${esc(a.note || '')}</textarea>
-            <div class="li-note-btns">
-              <button class="li-save" onclick="saveListNote('${a.id}')">Save</button>
-              <button class="li-cancel" onclick="toggleNoteEditor('${a.id}')">Cancel</button>
+            <div class="li-note ${a.note ? 'has-note' : ''}" onclick="toggleNoteEditor('${a.id}');event.stopPropagation()">
+              ${a.note ? esc(a.note) : '<em style="color:var(--muted);font-size:0.9em">+ add note…</em>'}
+            </div>
+            <div class="li-note-editor" id="ne-${a.id}">
+              <textarea class="li-note-ta" id="neta-${a.id}" placeholder="Add notes, tips, costs…" rows="3">${esc(a.note || '')}</textarea>
+              <div class="li-note-btns">
+                <button class="li-save" onclick="saveListNote('${a.id}')">Save</button>
+                <button class="li-cancel" onclick="toggleNoteEditor('${a.id}')">Cancel</button>
+              </div>
             </div>
           </div>
-          <div class="li-actions">
-            <button class="li-act-btn" onclick="event.stopPropagation();openEdit('${a.id}')">✏️ Edit</button>
-            <button class="li-act-btn del" onclick="event.stopPropagation();deleteActDirect('${a.id}')">🗑 Delete</button>
+          <div class="swipe-actions">
+            <button class="swipe-btn edit" onclick="event.stopPropagation();openEdit('${a.id}')">✏️ Edit</button>
+            <button class="swipe-btn delete" onclick="event.stopPropagation();deleteActDirect('${a.id}')">🗑 Delete</button>
           </div>
         </div>`;
     });
@@ -1299,7 +1308,13 @@ function renderFoodGuide(body) {
       <div class="lp-day-hd" style="background:${p.color};color:white">${p.icon} ${p.title}</div>
       <div class="lp-day-body"><ul class="ag-list">`;
     items.forEach((item, i) => {
-      html += `<li class="ag-item"><span class="ag-bullet"></span><span class="ag-item-txt">${esc(item)}</span><button class="ag-remove" onclick="removeFoodItem('${p.key}',${i})" title="Remove">×</button></li>`;
+      html += `<li class="ag-item swipe-row">
+        <div class="swipe-content"><span class="ag-bullet"></span><span class="ag-item-txt">${esc(item)}</span></div>
+        <div class="swipe-actions">
+          <button class="swipe-btn edit" onclick="event.stopPropagation();editFoodItem('${p.key}',${i})">✏️ Edit</button>
+          <button class="swipe-btn delete" onclick="event.stopPropagation();removeFoodItem('${p.key}',${i})">🗑 Delete</button>
+        </div>
+      </li>`;
     });
     html += `</ul></div>
       <div class="lp-day-add-row" onclick="addFoodItem('${p.key}')">+ Add item</div>
@@ -1327,6 +1342,16 @@ function removeFoodItem(key, idx) {
   renderLP();
 }
 
+function editFoodItem(key, idx) {
+  if (!foodGuide[key] || idx < 0 || idx >= foodGuide[key].length) return;
+  const current = foodGuide[key][idx];
+  const txt = prompt('Edit item', current);
+  if (txt === null) return;
+  foodGuide[key][idx] = txt.trim() || current;
+  saveLocal();
+  renderLP();
+}
+
 function renderRoadToHana(body) {
   let html = `<div class="ag-section ag-hana">
     <div class="lp-day-group">
@@ -1335,13 +1360,18 @@ function renderRoadToHana(body) {
   roadToHana.forEach((stop, i) => {
     const checkCls = stop.confirmed ? '' : ' empty';
     const checkChar = stop.confirmed ? '✓' : '○';
-    html += `<li class="ag-hana-item">
-      <span class="ag-hana-check${checkCls}" onclick="toggleHanaConfirmed(${i})" title="Tap to toggle">${checkChar}</span>
-      <div class="ag-hana-main">
-        <div class="ag-hana-title" onclick="toggleHanaConfirmed(${i})">${i+1}. ${esc(stop.name)}</div>
-        ${stop.desc ? `<div class="ag-hana-desc">${esc(stop.desc)}</div>` : ''}
+    html += `<li class="ag-hana-item swipe-row">
+      <div class="swipe-content">
+        <span class="ag-hana-check${checkCls}" onclick="toggleHanaConfirmed(${i})" title="Tap to toggle">${checkChar}</span>
+        <div class="ag-hana-main">
+          <div class="ag-hana-title" onclick="toggleHanaConfirmed(${i})">${i+1}. ${esc(stop.name)}</div>
+          ${stop.desc ? `<div class="ag-hana-desc">${esc(stop.desc)}</div>` : ''}
+        </div>
       </div>
-      <button class="ag-remove ag-remove-hana" onclick="event.stopPropagation();removeHanaStop(${i})" title="Remove">×</button>
+      <div class="swipe-actions">
+        <button class="swipe-btn edit" onclick="event.stopPropagation();editHanaStop(${i})">✏️ Edit</button>
+        <button class="swipe-btn delete" onclick="event.stopPropagation();removeHanaStop(${i})">🗑 Delete</button>
+      </div>
     </li>`;
   });
   html += `</ol></div>
@@ -1363,6 +1393,18 @@ function addHanaStop() {
 function removeHanaStop(idx) {
   if (idx < 0 || idx >= roadToHana.length) return;
   roadToHana.splice(idx, 1);
+  saveLocal();
+  renderLP();
+}
+
+function editHanaStop(idx) {
+  if (idx < 0 || idx >= roadToHana.length) return;
+  const stop = roadToHana[idx];
+  const name = prompt('Stop name', stop.name);
+  if (name === null) return;
+  const desc = prompt('Details', stop.desc || '');
+  if (desc === null) return;
+  roadToHana[idx] = { ...stop, name: (name || '').trim() || stop.name, desc: (desc || '').trim() };
   saveLocal();
   renderLP();
 }
@@ -1923,7 +1965,66 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('nm-ov').addEventListener('click', function(e) {
     if (e.target===this && curUser) this.classList.remove('open');
   });
+  setupSwipeRows();
 });
+
+function setupSwipeRows() {
+  const body = document.getElementById('lp-body');
+  if (!body) return;
+  const THRESH = 50;
+  let startX = 0, currentRow = null;
+
+  function getRow(el) {
+    return el && el.closest ? el.closest('.swipe-row') : null;
+  }
+  function closeAll() {
+    body.querySelectorAll('.swipe-row.revealed').forEach(r => r.classList.remove('revealed'));
+  }
+  function reveal(row) {
+    closeAll();
+    if (row) row.classList.add('revealed');
+  }
+
+  body.addEventListener('touchstart', function(e) {
+    const row = getRow(e.target);
+    if (!row || e.target.closest('.swipe-btn')) return;
+    startX = e.touches[0].clientX;
+    currentRow = row;
+  }, { passive: true });
+  body.addEventListener('touchmove', function(e) {
+    if (!currentRow) return;
+    const dx = e.touches[0].clientX - startX;
+    if (dx < -THRESH) currentRow.classList.add('revealed');
+    else if (dx > THRESH) currentRow.classList.remove('revealed');
+  }, { passive: true });
+  body.addEventListener('touchend', function() {
+    currentRow = null;
+  }, { passive: true });
+
+  body.addEventListener('mousedown', function(e) {
+    const row = getRow(e.target);
+    if (!row || e.target.closest('.swipe-btn')) return;
+    startX = e.clientX;
+    currentRow = row;
+  });
+  body.addEventListener('mousemove', function(e) {
+    if (!currentRow) return;
+    const dx = e.clientX - startX;
+    if (dx < -THRESH) currentRow.classList.add('revealed');
+    else if (dx > THRESH) currentRow.classList.remove('revealed');
+  });
+  body.addEventListener('mouseup', function() {
+    currentRow = null;
+  });
+  body.addEventListener('mouseleave', function() {
+    currentRow = null;
+  });
+
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('.swipe-btn')) closeAll();
+    else if (!e.target.closest('.swipe-row')) closeAll();
+  });
+}
 
 // ══════════════════════════════════════════════════════════════
 //  MOBILE VIEW SWITCHING
