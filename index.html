@@ -54,6 +54,7 @@
     .ibtn:hover { background: rgba(0,0,0,0.08); color: #1a1a1a; }
     .ibtn.has-badge { position: relative; }
     .ibtn .badge-dot { position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; border-radius: 50%; background: var(--sugg); }
+    .notes-unread-count { position: absolute; top: -2px; right: -2px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background: #eab308; color: #1a1a1a; font-size: 0.6em; font-weight: 800; display: flex; align-items: center; justify-content: center; }
     #notes-btn.has-unread { color: #eab308; box-shadow: 0 0 12px rgba(234,179,8,0.6), 0 0 24px rgba(234,179,8,0.35); border-color: rgba(234,179,8,0.6); animation: notes-glow 2s ease-in-out infinite; }
     @keyframes notes-glow { 50% { box-shadow: 0 0 16px rgba(234,179,8,0.7), 0 0 32px rgba(234,179,8,0.4); } }
 
@@ -67,17 +68,17 @@
     #tabs::-webkit-scrollbar { display: none; }
     .tab { padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(0,0,0,0.08); background: white; cursor: pointer; font-size: 0.75em; font-weight: 700; white-space: nowrap; color: var(--muted); transition: all .2s ease; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
     .tab:hover { border-color: rgba(0,0,0,0.15); color: #2d2a26; transform: translateY(-1px); }
-    .tab.on { font-weight: 700; }
-    [data-d=all].on { background:linear-gradient(135deg,rgba(14,165,233,0.25),rgba(14,165,233,0.15)); border-color:rgba(14,165,233,0.5); color:var(--cyan); box-shadow:0 4px 16px rgba(14,165,233,0.25); }
-    [data-d=tue].on { background:rgba(14,165,233,0.2); border-color:rgba(14,165,233,0.5); color:var(--d-tue); box-shadow:0 2px 12px rgba(14,165,233,0.3); }
-    [data-d=wed].on { background:rgba(34,197,94,0.2); border-color:rgba(34,197,94,0.5); color:var(--d-wed); box-shadow:0 2px 12px rgba(34,197,94,0.3); }
-    [data-d=thu].on { background:rgba(168,85,247,0.2); border-color:rgba(168,85,247,0.5); color:var(--d-thu); box-shadow:0 2px 12px rgba(168,85,247,0.3); }
-    [data-d=fri].on { background:rgba(249,115,22,0.2); border-color:rgba(249,115,22,0.5); color:var(--d-fri); box-shadow:0 2px 12px rgba(249,115,22,0.3); }
-    [data-d=sat].on { background:rgba(6,182,212,0.2); border-color:rgba(6,182,212,0.5); color:var(--d-sat); box-shadow:0 2px 12px rgba(6,182,212,0.3); }
-    [data-d=sun].on { background:rgba(234,179,8,0.2); border-color:rgba(234,179,8,0.5); color:var(--d-sun); box-shadow:0 2px 12px rgba(234,179,8,0.3); }
+    .tab.on { font-weight: 700; border-color: transparent; color: white; }
+    [data-d=all].on { background: linear-gradient(135deg, #0ea5e9, #06b6d4); box-shadow: 0 2px 12px rgba(14,165,233,0.4); }
+    [data-d=tue].on { background: var(--d-tue); box-shadow: 0 2px 12px rgba(14,165,233,0.4); }
+    [data-d=wed].on { background: var(--d-wed); box-shadow: 0 2px 12px rgba(34,197,94,0.4); }
+    [data-d=thu].on { background: var(--d-thu); box-shadow: 0 2px 12px rgba(168,85,247,0.4); }
+    [data-d=fri].on { background: var(--d-fri); box-shadow: 0 2px 12px rgba(249,115,22,0.4); }
+    [data-d=sat].on { background: var(--d-sat); box-shadow: 0 2px 12px rgba(6,182,212,0.4); }
+    [data-d=sun].on { background: var(--d-sun); box-shadow: 0 2px 12px rgba(234,179,8,0.4); }
     .tab-divider { width:1px; height:20px; background:rgba(0,0,0,0.12); margin:0 4px; align-self:center; flex-shrink:0; }
     .tab-label { font-size:0.65em; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; padding:0 6px; align-self:center; }
-    [data-d=food].on,[data-d=hana].on { background:rgba(20,184,166,0.2); border-color:rgba(20,184,166,0.5); color:var(--teal); box-shadow:0 2px 12px rgba(20,184,166,0.3); }
+    [data-d=food].on,[data-d=hana].on { background: var(--teal); border-color: transparent; color: white; box-shadow: 0 2px 12px rgba(20,184,166,0.4); }
 
     /* ── MAIN AREA (list + map) ── */
     #mw { flex: 1; display: flex; overflow: hidden; position: relative; }
@@ -106,6 +107,7 @@
       font-weight: 700; cursor: pointer; transition: all .15s; box-shadow: 0 2px 8px rgba(34,197,94,0.3);
     }
     .lp-add:hover { background: linear-gradient(135deg,#16a34a,#0d9488); box-shadow: 0 4px 12px rgba(34,197,94,0.4); }
+    .lp-chat-btn { flex-shrink: 0; position: relative; }
     .lp-close { width: 26px; height: 26px; border-radius: 50%; background: rgba(0,0,0,0.05); border: 1px solid var(--bdr); color: var(--muted); cursor: pointer; font-size: 0.82em; display: none; align-items: center; justify-content: center; }
 
     .lp-body { flex: 1; overflow-y: auto; padding: 12px; }
@@ -471,6 +473,7 @@
     .notes-start-act { flex: 1; min-width: 120px; background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.08); border-radius: 10px; padding: 8px 10px; font-size: 0.8em; color: #1a1a1a; outline: none; }
     .notes-start-act:focus { border-color: rgba(20,184,166,0.5); }
     .notes-empty { padding: 24px; text-align: center; color: #888; font-size: 0.85em; }
+    .notes-updates-section { padding: 12px 14px; border-bottom: 1px solid rgba(0,0,0,0.06); max-height: 180px; overflow-y: auto; }
 
     @media (max-width: 720px) {
       #notes-panel {
@@ -563,11 +566,17 @@
       #tabs { background: rgba(30,45,58,0.9); border-bottom-color: var(--bdr); }
       .tab { background: rgba(255,255,255,0.05); border-color: var(--bdr); color: var(--muted); box-shadow: none; }
       .tab:hover { border-color: rgba(255,255,255,0.15); color: #e5e0d8; }
-      [data-d=all].on { background: rgba(14,165,233,0.25); border-color: rgba(14,165,233,0.5); }
-      [data-d=tue].on,[data-d=wed].on,[data-d=thu].on,[data-d=fri].on,[data-d=sat].on,[data-d=sun].on { box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+      .tab.on { color: white; border-color: transparent; }
+      [data-d=all].on { background: linear-gradient(135deg, #0ea5e9, #06b6d4); }
+      [data-d=tue].on { background: var(--d-tue); }
+      [data-d=wed].on { background: var(--d-wed); }
+      [data-d=thu].on { background: var(--d-thu); }
+      [data-d=fri].on { background: var(--d-fri); }
+      [data-d=sat].on { background: var(--d-sat); }
+      [data-d=sun].on { background: var(--d-sun); }
       .tab-divider { background: var(--bdr); }
       .tab-label { color: var(--muted); }
-      [data-d=food].on,[data-d=hana].on { background: rgba(129,178,154,0.25); border-color: rgba(129,178,154,0.5); color: var(--teal); }
+      [data-d=food].on,[data-d=hana].on { background: var(--teal); color: white; }
 
       #lp { background: rgba(30,45,58,0.96); border-right-color: var(--bdr); }
       @media (max-width: 720px) { #lp.open { box-shadow: 4px 0 24px rgba(0,0,0,0.6); } }
@@ -645,6 +654,7 @@
       .notes-start-h { color: var(--muted); }
       .notes-start-act { background: rgba(255,255,255,0.06); border-color: var(--bdr); color: white; }
       .notes-empty { color: var(--muted); }
+      .notes-updates-section { border-bottom-color: var(--bdr); }
 
       .ov { background: rgba(0,0,0,0.62); }
       .modal { background: rgba(38,55,70,0.97); border-color: var(--bdr); box-shadow: 0 -10px 48px rgba(0,0,0,0.4); }
@@ -787,6 +797,7 @@
     <!-- LEFT: Always-visible list panel -->
     <div id="lp">
       <div class="lp-hd">
+        <button class="ibtn lp-chat-btn" onclick="toggleNotesPanel()" title="Group chat">💬</button>
         <span class="lp-title" id="lp-title">📋 Schedule</span>
         <button class="lp-add" onclick="openAdd()">+ Add</button>
         <button class="lp-close" onclick="setMobileView('map')">✕</button>
@@ -908,6 +919,7 @@ let curUser = null, curDay = 'all';
 let acts = {}, mkrs = {};
 let foodGuide = { breakfast:[], lunch:[], sweets:[], bookAsap:[] };
 let roadToHana = [];
+let listUpdates = [];
 let curId = null, visIds = [], editId = null;
 let pickMode = false, pickTarget = null;
 let travelers = ['Traveler 1','Traveler 2','Traveler 3','Traveler 4','Traveler 5'];
@@ -977,7 +989,9 @@ function loadLocal() {
   const st = localStorage.getItem('mw_travelers');
   const fg = localStorage.getItem('mw_foodGuide');
   const rth = localStorage.getItem('mw_roadToHana');
+  const lu = localStorage.getItem('mw_listUpdates');
   if (st) { try { travelers = JSON.parse(st); } catch(e){} }
+  if (lu) { try { listUpdates = JSON.parse(lu); } catch(e){} }
   if (fg) { try { foodGuide = JSON.parse(fg); } catch(e){} }
   const fgEmpty = !(foodGuide.breakfast?.length || foodGuide.lunch?.length || foodGuide.sweets?.length || foodGuide.bookAsap?.length);
   if (fgEmpty) foodGuide = JSON.parse(JSON.stringify(FOOD_GUIDE_DEFAULTS));
@@ -996,6 +1010,15 @@ function saveLocal() {
   localStorage.setItem('mw_travelers', JSON.stringify(travelers));
   localStorage.setItem('mw_foodGuide', JSON.stringify(foodGuide));
   localStorage.setItem('mw_roadToHana', JSON.stringify(roadToHana));
+  localStorage.setItem('mw_listUpdates', JSON.stringify(listUpdates));
+}
+function addListNotification(text, source) {
+  listUpdates.push({ text, author: curUser || 'Anonymous', ts: Date.now(), source });
+  if (listUpdates.length > 200) listUpdates = listUpdates.slice(-150);
+  saveLocal();
+  updateNotesUnreadGlow();
+  const p = document.getElementById('notes-panel');
+  if (p && p.classList.contains('open')) renderNotesPanel();
 }
 
 function setupFBListeners() {
@@ -1270,6 +1293,8 @@ function addFoodItem(key) {
   if (!txt || !txt.trim()) return;
   foodGuide[key] = foodGuide[key] || [];
   foodGuide[key].push(txt.trim());
+  const labels = { breakfast:'Breakfast & Brunch', lunch:'Lunch & Dinner', sweets:'Sweets & Snacks', bookAsap:'Book These ASAP' };
+  addListNotification(`🍴 Added "${txt.trim()}" to ${labels[key] || key}`, 'food');
   saveLocal();
   renderLP();
 }
@@ -1299,6 +1324,7 @@ function addHanaStop() {
   if (!name || !name.trim()) return;
   const desc = prompt('Details (e.g. Mile 2. $10 parking. ~45 min)') || '';
   roadToHana.push({ name: name.trim(), desc: desc.trim(), confirmed: false });
+  addListNotification(`🛤 Added "${name.trim()}" to Road to Hana`, 'hana');
   saveLocal();
   renderLP();
 }
@@ -1500,21 +1526,27 @@ function addCmt(id) {
 //  NOTES / NOTIFICATIONS PANEL
 // ══════════════════════════════════════════════════════════════
 const NOTES_LAST_VIEWED_KEY = 'mw2026_last_notes_viewed';
-function getLatestNoteTs() {
-  let latest = 0;
+function getUnreadCount() {
+  const lastViewed = parseInt(localStorage.getItem(NOTES_LAST_VIEWED_KEY) || '0', 10);
+  let count = 0;
   Object.values(acts).forEach(a => {
     const notes = a.notes || {};
-    Object.values(notes).forEach(n => { if (n && n.ts) latest = Math.max(latest, n.ts); });
+    Object.values(notes).forEach(n => { if (n && n.ts && n.ts > lastViewed) count++; });
   });
-  return latest;
+  listUpdates.forEach(u => { if (u && u.ts > lastViewed) count++; });
+  return count;
 }
 function updateNotesUnreadGlow() {
-  const btn = document.getElementById('notes-btn');
-  if (!btn) return;
-  const latest = getLatestNoteTs();
-  const lastViewed = parseInt(localStorage.getItem(NOTES_LAST_VIEWED_KEY) || '0', 10);
-  if (latest > lastViewed) btn.classList.add('has-unread');
-  else btn.classList.remove('has-unread');
+  const count = getUnreadCount();
+  [document.getElementById('notes-btn'), document.querySelector('.lp-chat-btn')].forEach(btn => {
+    if (!btn) return;
+    btn.classList.toggle('has-unread', count > 0);
+    let b = btn.querySelector('.notes-unread-count');
+    if (count > 0) {
+      if (!b) { b = document.createElement('span'); b.className = 'notes-unread-count'; btn.appendChild(b); }
+      b.textContent = count > 99 ? '99+' : String(count);
+    } else if (b) b.remove();
+  });
 }
 function toggleNotesPanel() {
   const p = document.getElementById('notes-panel');
@@ -1522,8 +1554,7 @@ function toggleNotesPanel() {
     p.classList.remove('open');
     document.removeEventListener('click', onNotesClickOutside);
   } else {
-    const latest = getLatestNoteTs();
-    localStorage.setItem(NOTES_LAST_VIEWED_KEY, String(Math.max(Date.now(), latest)));
+    localStorage.setItem(NOTES_LAST_VIEWED_KEY, String(Date.now()));
     updateNotesUnreadGlow();
     renderNotesPanel();
     p.classList.add('open');
@@ -1575,6 +1606,12 @@ function renderNotesPanel() {
   });
   const sorted = Object.entries(threads).sort((a, b) => (b[1].latest || 0) - (a[1].latest || 0));
   const emptyMsg = actList.length ? 'No threads yet.<br>Start one above!' : 'No activities yet.<br>Add a suggestion first!';
+  const updatesHtml = listUpdates.length ? listUpdates.slice(-50).reverse().map(u => `
+    <div class="notes-msg">
+      <div class="notes-msg-txt">${esc(u.text || '')}</div>
+      <div class="notes-msg-meta">${esc(u.author || '?')} · ${fmtTs(u.ts)}</div>
+    </div>`).join('') : '';
+  const updatesSection = listUpdates.length ? `<div class="notes-updates-section"><div class="notes-start-h">Recent updates</div>${updatesHtml}</div>` : '';
   const threadsHtml = sorted.length ? sorted.map(([actId, t]) => {
     const rid = 'nr-' + actId;
     const msgs = t.notes.map((n, i) => `
@@ -1592,7 +1629,7 @@ function renderNotesPanel() {
       </div>
     </div>`;
   }).join('') : `<div class="notes-empty">${emptyMsg}</div>`;
-  body.innerHTML = startHtml + threadsHtml;
+  body.innerHTML = updatesSection + startHtml + threadsHtml;
 }
 function replyFromPanel(actId, inputId) {
   const el = document.getElementById(inputId);
@@ -1711,6 +1748,7 @@ function saveAct() {
     const nid = 'n' + Date.now();
     const notifNote = { text: `💡 New suggestion: ${name}`, author: curUser || 'Anonymous', ts: Date.now() };
     const full = {...data, id, status:'suggestion', addedBy:curUser||'Anonymous', approvals:{}, notes:{ [nid]: notifNote }, lat:20.798, lng:-156.34};
+    addListNotification(`📋 New suggestion: ${name}`, 'schedule');
     if (db) { db.ref(`activities/${id}`).set(full); }
     else {
       acts[id]=full; saveLocal(); renderAll();
