@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Maui Wowie 2026 🏝️</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+    body { font-family: 'Nunito', -apple-system, sans-serif; background: linear-gradient(165deg, #fff5eb 0%, #e8f4fd 40%, #e0f7f4 100%); color: #2d2a26; min-height: 100%; }
+
+    :root {
+      --gb:    rgba(255, 255, 255, 0.95);
+      --gb2:   rgba(255, 250, 245, 0.98);
+      --bdr:   rgba(0, 0, 0, 0.08);
+      --blur:  blur(20px) saturate(1.2);
+      --cyan:  #0ea5e9;
+      --teal:  #14b8a6;
+      --coral: #f97316;
+      --sand:  #78716c;
+      --sugg:  #f97316;
+      --muted: rgba(0, 0, 0, 0.5);
+      --d-tue: #0ea5e9; --d-wed: #22c55e; --d-thu: #a855f7;
+      --d-fri: #f97316; --d-sat: #06b6d4; --d-sun: #eab308;
+    }
+
+    /* ── SHELL ── */
+    #app { display: flex; flex-direction: column; height: 100dvh; }
+
+    /* ── HEADER ── */
+    #hdr {
+      background: rgba(255,255,255,0.92); border-bottom: 1px solid rgba(0,0,0,0.06);
+      backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+      padding: 12px 18px; display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0; z-index: 200; position: relative; box-shadow: 0 2px 20px rgba(0,0,0,0.04);
+    }
+    #hdr::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:1px;
+      background: linear-gradient(90deg, transparent, var(--coral) 20%, var(--cyan) 50%, var(--teal) 80%, transparent);
+      opacity: 0.6;
+    }
+    #hdr h1 {
+      font-size: 1.15em; font-weight: 800; letter-spacing: -0.02em;
+      background: linear-gradient(110deg, #f97316 0%, #0ea5e9 50%, #22c55e 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    #hdr .sub { font-size: 0.69em; color: var(--muted); margin-top: 1px; }
+    .hdr-r { display: flex; align-items: center; gap: 8px; }
+    .chip { background: rgba(14,165,233,0.12); border: 1px solid rgba(14,165,233,0.35); border-radius: 16px; padding: 4px 11px; font-size: 0.76em; cursor: pointer; color: var(--cyan); transition: all .18s; }
+    .chip:hover { background: rgba(14,165,233,0.2); }
+    .ibtn { width: 30px; height: 30px; border-radius: 50%; background: rgba(0,0,0,0.04); border: 1px solid var(--bdr); color: var(--muted); font-size: 0.87em; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+    .ibtn:hover { background: rgba(0,0,0,0.08); color: #1a1a1a; }
+    .ibtn.has-badge { position: relative; }
+    .ibtn .badge-dot { position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; border-radius: 50%; background: var(--sugg); }
+    #notes-btn.has-unread { color: #eab308; box-shadow: 0 0 12px rgba(234,179,8,0.6), 0 0 24px rgba(234,179,8,0.35); border-color: rgba(234,179,8,0.6); animation: notes-glow 2s ease-in-out infinite; }
+    @keyframes notes-glow { 50% { box-shadow: 0 0 16px rgba(234,179,8,0.7), 0 0 32px rgba(234,179,8,0.4); } }
+
+    /* ── TABS ── */
+    #tabs {
+      display: flex; gap: 6px; padding: 10px 14px;
+      background: rgba(255,255,255,0.85); border-bottom: 1px solid rgba(0,0,0,0.06);
+      backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+      overflow-x: auto; scrollbar-width: none; flex-shrink: 0;
+    }
+    #tabs::-webkit-scrollbar { display: none; }
+    .tab { padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(0,0,0,0.08); background: white; cursor: pointer; font-size: 0.75em; font-weight: 700; white-space: nowrap; color: var(--muted); transition: all .2s ease; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+    .tab:hover { border-color: rgba(0,0,0,0.15); color: #2d2a26; transform: translateY(-1px); }
+    .tab.on { font-weight: 700; }
+    [data-d=all].on { background:linear-gradient(135deg,rgba(14,165,233,0.25),rgba(14,165,233,0.15)); border-color:rgba(14,165,233,0.5); color:var(--cyan); box-shadow:0 4px 16px rgba(14,165,233,0.25); }
+    [data-d=tue].on { background:rgba(14,165,233,0.2); border-color:rgba(14,165,233,0.5); color:var(--d-tue); box-shadow:0 2px 12px rgba(14,165,233,0.3); }
+    [data-d=wed].on { background:rgba(34,197,94,0.2); border-color:rgba(34,197,94,0.5); color:var(--d-wed); box-shadow:0 2px 12px rgba(34,197,94,0.3); }
+    [data-d=thu].on { background:rgba(168,85,247,0.2); border-color:rgba(168,85,247,0.5); color:var(--d-thu); box-shadow:0 2px 12px rgba(168,85,247,0.3); }
+    [data-d=fri].on { background:rgba(249,115,22,0.2); border-color:rgba(249,115,22,0.5); color:var(--d-fri); box-shadow:0 2px 12px rgba(249,115,22,0.3); }
+    [data-d=sat].on { background:rgba(6,182,212,0.2); border-color:rgba(6,182,212,0.5); color:var(--d-sat); box-shadow:0 2px 12px rgba(6,182,212,0.3); }
+    [data-d=sun].on { background:rgba(234,179,8,0.2); border-color:rgba(234,179,8,0.5); color:var(--d-sun); box-shadow:0 2px 12px rgba(234,179,8,0.3); }
+
+    /* ── MAIN AREA (list + map) ── */
+    #mw { flex: 1; display: flex; overflow: hidden; position: relative; }
+
+    /* ── LEFT LIST PANEL ── */
+    #lp {
+      width: 310px; flex-shrink: 0; display: flex; flex-direction: column;
+      background: rgba(255,255,255,0.95); border-right: 1px solid rgba(0,0,0,0.06);
+      backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+      z-index: 200; overflow: hidden;
+      transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+    }
+    @media (max-width: 720px) {
+      #lp { position: absolute; left: 0; top: 0; bottom: 0; z-index: 450; transform: translateX(-100%); }
+      #lp.open { transform: translateX(0); box-shadow: 8px 0 32px rgba(0,0,0,0.12); }
+    }
+
+    .lp-hd {
+      padding: 10px 12px; display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid var(--bdr); flex-shrink: 0;
+    }
+    .lp-title { font-size: 0.85em; font-weight: 700; color: #1a1a1a; flex: 1; }
+    .lp-add {
+      padding: 5px 12px; border-radius: 14px; background: linear-gradient(135deg,#22c55e,#14b8a6);
+      border: 1px solid rgba(34,197,94,0.5); color: white; font-size: 0.76em;
+      font-weight: 700; cursor: pointer; transition: all .15s; box-shadow: 0 2px 8px rgba(34,197,94,0.3);
+    }
+    .lp-add:hover { background: linear-gradient(135deg,#16a34a,#0d9488); box-shadow: 0 4px 12px rgba(34,197,94,0.4); }
+    .lp-close { width: 26px; height: 26px; border-radius: 50%; background: rgba(0,0,0,0.05); border: 1px solid var(--bdr); color: var(--muted); cursor: pointer; font-size: 0.82em; display: none; align-items: center; justify-content: center; }
+
+    .lp-body { flex: 1; overflow-y: auto; padding: 8px; }
+    .lp-day-hd {
+      padding: 6px 6px 4px; font-size: 0.68em; font-weight: 700;
+      position: sticky; top: 0; z-index: 10;
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      display: flex; align-items: center; gap: 6px; margin-bottom: 4px;
+    }
+    .lp-day-add {
+      width: 18px; height: 18px; border-radius: 50%; background: rgba(0,0,0,0.06);
+      border: 1px solid rgba(0,0,0,0.12); color: var(--muted);
+      cursor: pointer; font-size: 0.88em; display: flex; align-items: center;
+      justify-content: center; transition: all .12s; margin-left: auto;
+    }
+    .lp-day-add:hover { background: rgba(0,0,0,0.1); color: #1a1a1a; }
+
+    /* ── ACTIVITY CARD (legend-box style) ── */
+    .li {
+      background: white;
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 16px; margin-bottom: 8px; overflow: hidden;
+      transition: all .2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .li:hover { background: #fefefe; border-color: rgba(0,0,0,0.1); box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateY(-1px); }
+    .li.active { border-color: var(--teal); background: linear-gradient(135deg,rgba(20,184,166,0.1),rgba(20,184,166,0.05)); box-shadow: 0 4px 20px rgba(20,184,166,0.2); }
+
+    .li-top { display: flex; align-items: center; gap: 8px; padding: 9px 10px 6px; cursor: pointer; }
+    .li-num {
+      width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.63em; font-weight: 800; color: var(--sand);
+    }
+    .li-info { flex: 1; min-width: 0; }
+    .li-time { font-size: 0.64em; color: var(--muted); }
+    .li-name { font-size: 0.8em; font-weight: 600; color: rgba(245,240,232,0.95); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .li-tag { font-size: 0.58em; font-weight: 700; padding: 1px 5px; border-radius: 5px; border: 1px solid; flex-shrink: 0; }
+    .t-food      { background:rgba(224,122,95,0.18); color:#e07a5f; border-color:rgba(224,122,95,0.4); }
+    .t-activity  { background:rgba(129,178,154,0.18); color:var(--teal); border-color:rgba(129,178,154,0.4); }
+    .t-logistics { background:rgba(126,184,218,0.18); color:var(--cyan); border-color:rgba(126,184,218,0.4); }
+
+    /* Inline note — always visible */
+    .li-note {
+      padding: 0 10px 7px 40px;
+      font-size: 0.72em; color: var(--muted); line-height: 1.45;
+      border-left: 2px solid transparent; margin: 0 0 0 0;
+    }
+    .li-note.has-note {
+      color: rgba(212,196,168,0.7);
+      border-left: 2px solid rgba(129,178,154,0.4);
+      background: rgba(129,178,154,0.04);
+    }
+
+    /* Note editor */
+    .li-note-editor { display: none; padding: 0 10px 8px 10px; }
+    .li-note-editor.open { display: block; }
+    .li-note-ta { width: 100%; background: rgba(0,0,0,0.02); border: 1px solid rgba(20,184,166,0.35); border-radius: 8px; padding: 7px 9px; font-size: 0.75em; font-family: inherit; outline: none; resize: none; min-height: 52px; color: #1a1a1a; }
+    .li-note-ta::placeholder { color: #999; }
+    .li-note-btns { display: flex; gap: 6px; margin-top: 5px; }
+    .li-save { padding: 4px 12px; border-radius: 6px; background: rgba(129,178,154,0.25); border: 1px solid rgba(129,178,154,0.45); color: var(--teal); font-size: 0.72em; font-weight: 700; cursor: pointer; }
+    .li-save:hover { background: rgba(129,178,154,0.4); }
+    .li-cancel { padding: 4px 10px; border-radius: 6px; background: rgba(212,196,168,0.06); border: 1px solid var(--bdr); color: var(--muted); font-size: 0.72em; cursor: pointer; }
+
+    /* Card action row */
+    .li-actions { display: flex; gap: 5px; padding: 0 10px 8px; }
+    .li-act-btn { flex: 1; padding: 5px; border-radius: 7px; font-size: 0.68em; font-weight: 600; cursor: pointer; border: 1px solid var(--bdr); background: rgba(255,255,255,0.05); color: var(--muted); transition: all .12s; }
+    .li-act-btn:hover { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.85); }
+    .li-act-btn.del { background: rgba(255,107,53,0.08); color: var(--sugg); border-color: rgba(255,107,53,0.22); }
+    .li-act-btn.del:hover { background: rgba(255,107,53,0.2); }
+
+    .sugg-badge { font-size: 0.58em; background: rgba(224,122,95,0.2); color: var(--coral); border: 1px solid rgba(224,122,95,0.4); border-radius: 6px; padding: 1px 5px; font-weight: 700; }
+
+    /* ── MAP WRAPPER ── */
+    #mw-r { flex: 1; position: relative; overflow: hidden; }
+    #map { width: 100%; height: 100%; }
+    .mkr-icon { background: none !important; border: none !important; }
+    .mkr-icon > div { margin: 0 !important; }
+
+    /* Pick banner */
+    #pick-banner {
+      position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+      background: white; backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+      border: 1px solid rgba(20,184,166,0.4); color: var(--teal); padding: 7px 16px;
+      border-radius: 20px; font-size: 0.81em; font-weight: 700; z-index: 500;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1); display: none; pointer-events: none;
+    }
+    #pick-banner.on { display: block; }
+
+    /* Legend */
+    #legend {
+      position: absolute; bottom: 14px; right: 14px; z-index: 400;
+      background: rgba(255,255,255,0.95); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+      border: 1px solid rgba(0,0,0,0.06); border-radius: 14px; padding: 10px 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08); font-size: 0.67em;
+    }
+    .lg-r { display: flex; align-items: center; gap: 5px; color: var(--muted); margin-bottom: 3px; }
+    .lg-r:last-child { margin-bottom: 0; }
+    .lg-d { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .lg-pulse { animation: mwp 2s infinite; }
+    @keyframes mwp { 0%,100% { box-shadow:0 0 0 0 rgba(224,122,95,0.5); } 50% { box-shadow:0 0 0 5px rgba(224,122,95,0); } }
+
+    /* Old floating list toggle — hidden on mobile, replaced by bottom nav */
+    #list-toggle-btn { display: none; }
+
+    /* FAB — desktop only */
+    #fab {
+      position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
+      padding: 10px 24px; border-radius: 28px;
+      background: linear-gradient(135deg, #f97316, #22c55e);
+      border: none; color: white; font-size: 0.85em; font-weight: 800;
+      cursor: pointer; box-shadow: 0 6px 24px rgba(249,115,22,0.4);
+      z-index: 400; display: flex; align-items: center; gap: 8px; transition: all .25s ease;
+    }
+    #fab:hover { box-shadow: 0 8px 32px rgba(249,115,22,0.5); transform: translateX(-50%) translateY(-2px); }
+
+    /* ── MOBILE: BOTTOM TAB BAR ── */
+    #mob-tabs {
+      display: none;
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 500;
+      height: 56px;
+      padding-bottom: env(safe-area-inset-bottom);
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      border-top: 1px solid rgba(0,0,0,0.06);
+      box-shadow: 0 -4px 24px rgba(0,0,0,0.08);
+    }
+    .mob-tab {
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 2px; border: none; background: none; color: rgba(0,0,0,0.45);
+      font-size: 0.7em; font-weight: 700; cursor: pointer;
+      -webkit-tap-highlight-color: transparent; transition: color .2s;
+    }
+    .mob-tab.on { color: var(--teal); }
+    .mob-tab-icon { font-size: 1.5em; line-height: 1; }
+
+    /* ── MOBILE FAB ── */
+    #mob-fab {
+      position: fixed; bottom: calc(56px + env(safe-area-inset-bottom) + 12px); right: 20px;
+      width: 56px; height: 56px; border-radius: 50%; z-index: 450;
+      background: linear-gradient(145deg, #f97316, #22c55e);
+      border: none;
+      color: white; font-size: 1.8em; font-weight: 300; line-height: 1;
+      box-shadow: 0 6px 24px rgba(249,115,22,0.45);
+      cursor: pointer; display: none; align-items: center; justify-content: center;
+      transition: transform .15s, box-shadow .15s; -webkit-tap-highlight-color: transparent;
+    }
+    #mob-fab:active { transform: scale(0.92); }
+
+    .lp-handle { display: none; }
+
+    @media (max-width: 720px) {
+      #app { padding-bottom: calc(56px + env(safe-area-inset-bottom)); }
+      #bnav { display: none !important; }
+      #fab { display: none !important; }
+      #list-toggle-btn { display: none !important; }
+      #mob-tabs { display: flex; }
+      #mob-fab { display: flex; }
+      body.mob-schedule #mob-fab { display: none !important; }
+
+      /* Header: compact, clear */
+      #hdr { padding: 10px 16px; min-height: 48px; }
+      #hdr h1 { font-size: 1em; }
+      #hdr .sub { display: none; }
+      .chip { padding: 6px 12px; font-size: 0.8em; }
+      .ibtn { width: 36px; height: 36px; font-size: 1em; }
+
+      /* Day tabs: horizontal scroll, pill style */
+      #tabs { padding: 8px 12px; gap: 8px; -webkit-overflow-scrolling: touch; }
+      .tab { padding: 8px 14px; font-size: 0.78em; flex-shrink: 0; }
+
+      /* Map view: full map */
+      #mw-r { position: absolute; inset: 0; transition: opacity 0.35s ease; }
+      body.mob-schedule #mw-r { opacity: 0; pointer-events: none; }
+      #legend { bottom: calc(56px + env(safe-area-inset-bottom) + 8px); right: 12px; font-size: 0.7em; transition: opacity 0.35s ease; }
+      body.mob-schedule #legend { opacity: 0; pointer-events: none; }
+
+      /* Schedule view: full-screen list (replaces map when active) */
+      #lp {
+        position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: calc(56px + env(safe-area-inset-bottom)) !important;
+        width: 100% !important; height: auto !important;
+        transform: none !important;
+        display: none !important;
+        background: linear-gradient(180deg, #fff9f5 0%, #f0f9ff 100%);
+        border-right: none !important;
+        z-index: 350;
+      }
+      #lp.mob-schedule-on { display: flex !important; }
+      .lp-handle { display: none !important; }
+      .lp-close { display: none !important; }
+      .lp-hd {
+        padding: 12px 16px; border-bottom: 1px solid rgba(0,0,0,0.06);
+        display: flex; align-items: center; gap: 10px;
+      }
+      .lp-title { font-size: 1em; font-weight: 700; }
+      .lp-add {
+        padding: 8px 16px; font-size: 0.82em; border-radius: 20px;
+        background: linear-gradient(135deg,#22c55e,#14b8a6); color: white; border: none;
+        margin-left: auto; box-shadow: 0 4px 12px rgba(34,197,94,0.35);
+      }
+
+      /* Schedule cards: clean, tap-friendly */
+      .lp-body { padding: 12px 16px 24px; }
+      .lp-day-hd { font-size: 0.75em; padding: 10px 0 6px; margin-top: 4px; color: var(--muted); }
+      .lp-day-hd:first-of-type { margin-top: 0; }
+      .lp-day-add { display: none; }
+      .li {
+        background: white;
+        border: 1px solid rgba(0,0,0,0.06);
+        border-radius: 16px; margin-bottom: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      }
+      .li:active { background: #fafafa; }
+      .li.active { border-color: var(--teal); background: linear-gradient(135deg,rgba(20,184,166,0.1),rgba(20,184,166,0.05)); box-shadow: 0 4px 16px rgba(20,184,166,0.2); }
+      .li-top { padding: 14px 14px 10px; }
+      .li-num { width: 28px; height: 28px; font-size: 0.7em; }
+      .li-name { font-size: 0.95em; white-space: normal; line-height: 1.3; }
+      .li-time { font-size: 0.75em; color: var(--muted); margin-bottom: 2px; }
+      /* Hide note & actions on mobile cards — tap opens detail */
+      .li-note, .li-note-editor, .li-actions { display: none !important; }
+      .li-tag, .sugg-badge { font-size: 0.65em; padding: 2px 6px; }
+
+      /* Detail panel */
+      #dp {
+        width: 100% !important; top: auto !important; bottom: 0 !important;
+        height: 92dvh !important;
+        transform: translateY(100%) !important;
+        border-left: none !important; border-top: 1px solid var(--bdr) !important;
+        border-radius: 20px 20px 0 0 !important; right: 0 !important;
+      }
+      #dp.open { transform: translateY(0) !important; }
+      .modal { padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
+    }
+
+    /* ── DETAIL PANEL ── */
+    #dp {
+      position: fixed; top: 0; right: 0; width: 360px; height: 100dvh;
+      background: white; border-left: 1px solid rgba(0,0,0,0.06);
+      box-shadow: -8px 0 48px rgba(0,0,0,0.1);
+      transform: translateX(100%); transition: transform 0.32s cubic-bezier(.4,0,.2,1);
+      display: flex; flex-direction: column; z-index: 1000; overflow: hidden;
+    }
+    #dp.open { transform: translateX(0); }
+
+    .dp-img { width: 100%; height: 160px; flex-shrink: 0; position: relative; overflow: hidden; }
+    .dp-img-bg { width: 100%; height: 100%; background-size: cover; background-position: center; }
+    .dp-img::after { content:''; position:absolute; bottom:0; left:0; right:0; height:60%; background:linear-gradient(transparent,rgba(255,255,255,0.92)); pointer-events:none; }
+    .dp-close { position:absolute; top:10px; right:10px; z-index:10; width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,0.9); backdrop-filter:blur(8px); border:1px solid rgba(0,0,0,0.08); color:#333; font-size:0.87em; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
+    .dp-nav { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:7px; z-index:10; }
+    .dp-nb { width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.9); backdrop-filter:blur(8px); border:1px solid rgba(0,0,0,0.08); color:#333; cursor:pointer; font-size:0.84em; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
+    .dp-ctr { font-size:0.7em; font-weight:700; color:rgba(0,0,0,0.6); }
+    .dp-body { flex:1; overflow-y:auto; padding:14px 16px; background:white; }
+
+    .badge { display:inline-flex; align-items:center; padding:2px 9px; border-radius:10px; font-size:0.65em; font-weight:700; border:1px solid; }
+    .badge-s { background:rgba(224,122,95,0.2); color:var(--coral); border-color:rgba(224,122,95,0.4); }
+    .badge-a { background:rgba(129,178,154,0.2); color:var(--teal); border-color:rgba(129,178,154,0.4); }
+
+    .dp-title { font-size:1.1em; font-weight:700; color:#1a1a1a; margin:7px 0 5px; line-height:1.3; }
+    .meta-r { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:11px; align-items:center; }
+    .meta-t { font-size:0.75em; color:#666; }
+
+    .sec { margin-bottom: 13px; }
+    .sec-h { font-size:0.69em; font-weight:700; color:#666; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:6px; display:flex; align-items:center; gap:5px; }
+    .sec-h::after { content:''; flex:1; height:1px; background:rgba(0,0,0,0.08); }
+
+    .tnote { background:rgba(20,184,166,0.06); border-left:3px solid rgba(20,184,166,0.5); border-radius:0 10px 10px 0; padding:9px 11px; font-size:0.81em; color:#333; line-height:1.6; cursor:pointer; position:relative; transition:background .15s; }
+    .tnote:hover { background:rgba(20,184,166,0.1); }
+    .tnote .eh { position:absolute; top:6px; right:8px; font-size:0.67em; color:#888; opacity:0; transition:opacity .15s; }
+    .tnote:hover .eh { opacity:1; }
+    .tnote-ta { width:100%; background:none; border:none; outline:none; font:inherit; color:#1a1a1a; resize:none; min-height:52px; }
+    .save-nb { margin-top:6px; padding:5px 12px; border-radius:8px; background:linear-gradient(135deg,#22c55e,#14b8a6); border:none; color:white; font-size:0.76em; font-weight:700; cursor:pointer; }
+    .save-nb:hover { background:linear-gradient(135deg,#16a34a,#0d9488); }
+
+    .av-box { background:rgba(0,0,0,0.02); border:1px solid rgba(0,0,0,0.06); border-radius:12px; padding:11px; }
+    .av-bar-r { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+    .av-bar { flex:1; height:6px; background:rgba(0,0,0,0.06); border-radius:3px; overflow:hidden; }
+    .av-fill { height:100%; background:linear-gradient(90deg,#22c55e,#14b8a6); border-radius:3px; transition:width .4s; }
+    .av-ct { font-size:0.71em; font-weight:700; color:#666; }
+    .av-chips { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:8px; }
+    .av-chip { padding:2px 7px; background:rgba(20,184,166,0.12); color:var(--teal); border-radius:10px; font-size:0.66em; font-weight:700; border:1px solid rgba(20,184,166,0.3); }
+    .av-btn { width:100%; padding:9px; border-radius:10px; background:rgba(20,184,166,0.1); color:var(--teal); border:1px solid rgba(20,184,166,0.35); font-weight:700; font-size:0.81em; cursor:pointer; transition:all .18s; }
+    .av-btn:hover, .av-btn.done { background:rgba(20,184,166,0.2); }
+    .av-full { background:rgba(20,184,166,0.08); color:var(--teal); padding:8px 10px; border-radius:10px; font-size:0.78em; font-weight:700; text-align:center; border:1px solid rgba(20,184,166,0.3); }
+
+    .cmt-list { display:flex; flex-direction:column; gap:6px; margin-bottom:8px; }
+    .cmt { background:rgba(0,0,0,0.02); border:1px solid rgba(0,0,0,0.06); border-radius:12px; padding:9px 11px; }
+    .cmt-hd { display:flex; align-items:center; gap:5px; margin-bottom:3px; }
+    .cmt-av { width:22px; height:22px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:0.59em; font-weight:700; color:white; background:linear-gradient(135deg,#f97316,#22c55e); }
+    .cmt-who { font-size:0.74em; font-weight:700; color:#1a1a1a; }
+    .cmt-when { font-size:0.66em; color:#888; margin-left:auto; }
+    .cmt-txt { font-size:0.79em; color:#444; line-height:1.5; }
+    .cmt-row { display:flex; gap:7px; align-items:flex-end; }
+    .cmt-in { flex:1; background:rgba(0,0,0,0.03); border:1px solid rgba(0,0,0,0.08); border-radius:10px; padding:7px 10px; font-size:0.79em; font-family:inherit; outline:none; resize:none; min-height:36px; max-height:88px; color:#1a1a1a; transition:border-color .15s; }
+    .cmt-in:focus { border-color:rgba(20,184,166,0.5); }
+    .cmt-in::placeholder { color:#999; }
+    .cmt-send { width:34px; height:34px; border-radius:50%; flex-shrink:0; background:linear-gradient(135deg,#22c55e,#14b8a6); border:none; color:white; cursor:pointer; font-size:0.93em; display:flex; align-items:center; justify-content:center; }
+    .cmt-send:hover { background:linear-gradient(135deg,#16a34a,#0d9488); }
+    .edit-btn { width:100%; padding:9px; margin-top:7px; border-radius:10px; border:1px solid rgba(0,0,0,0.08); background:rgba(0,0,0,0.03); color:#666; font-weight:600; font-size:0.81em; cursor:pointer; transition:all .15s; }
+    .edit-btn:hover { background:rgba(0,0,0,0.06); color:#1a1a1a; }
+    .mile-badge { font-size:0.66em; background:rgba(129,178,154,0.22); color:var(--teal); border:1px solid rgba(129,178,154,0.4); border-radius:8px; padding:1px 6px; font-weight:700; }
+
+    /* ── NOTES / NOTIFICATIONS PANEL ── */
+    #notes-panel {
+      position: fixed; top: 56px; right: 12px;
+      width: min(360px, calc(100vw - 24px));
+      max-height: 70vh;
+      background: rgba(255,255,255,0.98);
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 18px;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.12);
+      z-index: 2000;
+      overflow: hidden;
+      display: none;
+    }
+    #notes-panel.open { display: flex; flex-direction: column; }
+    .notes-hd { padding: 12px 14px; border-bottom: 1px solid rgba(0,0,0,0.06); font-size: 0.85em; font-weight: 700; color: #1a1a1a; display: flex; align-items: center; justify-content: space-between; }
+    .notes-close { width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.06); color: #666; font-size: 1.2em; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .notes-close:hover { background: rgba(0,0,0,0.08); color: #1a1a1a; }
+    .notes-body { overflow-y: auto; max-height: 60vh; }
+    .notes-thread {
+      padding: 12px 14px; border-bottom: 1px solid rgba(0,0,0,0.05);
+      background: rgba(20,184,166,0.03);
+    }
+    .notes-thread-hd {
+      font-size: 0.78em; color: var(--teal); font-weight: 700; margin-bottom: 10px;
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
+    }
+    .notes-thread-hd:hover { color: var(--coral); }
+    .notes-msg {
+      padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+    .notes-msg:last-of-type { border-bottom: none; }
+    .notes-msg.reply { padding-left: 16px; border-left: 2px solid rgba(20,184,166,0.4); margin-left: 4px; }
+    .notes-msg-txt { font-size: 0.82em; color: #333; line-height: 1.4; }
+    .notes-msg-meta { font-size: 0.68em; color: #888; margin-top: 3px; }
+    .notes-reply-row { display: flex; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.06); }
+    .notes-reply-in { flex: 1; background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.08); border-radius: 10px; padding: 8px 10px; font-size: 0.8em; color: #1a1a1a; outline: none; }
+    .notes-reply-in:focus { border-color: rgba(20,184,166,0.5); }
+    .notes-reply-in::placeholder { color: #999; }
+    .notes-reply-btn { padding: 8px 14px; border-radius: 10px; background: linear-gradient(135deg,#22c55e,#14b8a6); border: none; color: white; font-size: 0.78em; font-weight: 600; cursor: pointer; flex-shrink: 0; }
+    .notes-reply-btn:hover { background: linear-gradient(135deg,#16a34a,#0d9488); }
+    .notes-start { padding: 12px 14px; border-bottom: 1px solid rgba(0,0,0,0.05); background: rgba(20,184,166,0.06); }
+    .notes-start-h { font-size: 0.7em; font-weight: 700; color: #666; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .notes-start-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .notes-start-act { flex: 1; min-width: 120px; background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.08); border-radius: 10px; padding: 8px 10px; font-size: 0.8em; color: #1a1a1a; outline: none; }
+    .notes-start-act:focus { border-color: rgba(20,184,166,0.5); }
+    .notes-empty { padding: 24px; text-align: center; color: #888; font-size: 0.85em; }
+
+    @media (max-width: 720px) {
+      #notes-panel {
+        top: 0; left: 0; right: 0; bottom: 0;
+        width: 100% !important; max-height: none !important;
+        border-radius: 0;
+        padding-top: env(safe-area-inset-top);
+      }
+      .notes-body { max-height: none !important; flex: 1; }
+      .notes-start-row { flex-direction: column; align-items: stretch; }
+      .notes-start .notes-start-act, .notes-start .notes-reply-in { min-width: 0 !important; width: 100%; }
+      .notes-reply-row { flex-wrap: nowrap; }
+      .notes-reply-in { min-width: 0; }
+      #notes-btn.has-unread { -webkit-tap-highlight-color: transparent; }
+    }
+
+    /* ── MODALS ── */
+    .ov { position:fixed; inset:0; background:rgba(0,0,0,0.4); backdrop-filter:blur(6px); z-index:800; display:flex; align-items:flex-end; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; }
+    .ov.open { opacity:1; pointer-events:all; }
+    .modal { background:white; border:1px solid rgba(0,0,0,0.06); border-radius:22px 22px 0 0; padding:20px 18px; width:100%; max-width:480px; max-height:92dvh; overflow-y:auto; transform:translateY(26px); transition:transform .24s cubic-bezier(.4,0,.2,1); box-shadow:0 -12px 56px rgba(0,0,0,0.12); }
+    .ov.open .modal { transform:translateY(0); }
+    .modal-t { font-size:1.04em; font-weight:700; color:#1a1a1a; margin-bottom:14px; }
+    .fg { margin-bottom:11px; }
+    .fl { display:block; font-size:0.7em; font-weight:700; color:#666; text-transform:uppercase; letter-spacing:.4px; margin-bottom:4px; }
+    .fi,.fsel,.fta { width:100%; background:rgba(0,0,0,0.03); border:1px solid rgba(0,0,0,0.1); border-radius:10px; padding:8px 11px; font-size:0.85em; font-family:inherit; outline:none; transition:border-color .15s; color:#1a1a1a; }
+    .fi:focus,.fsel:focus,.fta:focus { border-color:rgba(20,184,166,0.6); }
+    .fi::placeholder,.fta::placeholder { color:#999; }
+    .fsel option { background:#fff; color:#1a1a1a; }
+    .fta { resize:vertical; min-height:62px; }
+    .fr { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .btn-p { width:100%; padding:11px; border-radius:12px; margin-top:7px; background:linear-gradient(135deg,#f97316,#22c55e); border:none; color:white; font-size:0.87em; font-weight:700; cursor:pointer; box-shadow:0 4px 16px rgba(249,115,22,0.3); transition:all .2s; }
+    .btn-p:hover { box-shadow:0 6px 24px rgba(249,115,22,0.4); }
+    .btn-s { width:100%; padding:11px; border-radius:12px; margin-top:7px; background:rgba(0,0,0,0.04); color:#666; border:1px solid rgba(0,0,0,0.08); font-size:0.87em; font-weight:600; cursor:pointer; }
+    .btn-s:hover { background:rgba(0,0,0,0.08); color:#1a1a1a; }
+    .btn-d { width:100%; padding:11px; border-radius:12px; margin-top:7px; background:rgba(239,68,68,0.1); color:#dc2626; border:1px solid rgba(239,68,68,0.3); font-size:0.87em; font-weight:600; cursor:pointer; }
+    .btn-d:hover { background:rgba(239,68,68,0.18); }
+
+    #nm-ov { align-items:center; }
+    #nm-ov .modal { border-radius:20px; text-align:center; max-width:340px; }
+    .nm-grid { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin:10px 0; }
+    .nm-opt { padding:9px; border:1px solid rgba(0,0,0,0.1); border-radius:10px; cursor:pointer; font-size:0.83em; font-weight:600; color:#666; background:rgba(0,0,0,0.02); transition:all .15s; }
+    .nm-opt:hover,.nm-opt.sel { border-color:rgba(20,184,166,0.5); color:var(--teal); background:rgba(20,184,166,0.08); }
+
+    .trv-row { display:flex; gap:7px; align-items:center; margin-bottom:6px; }
+    .trv-n { font-size:0.74em; color:#666; width:18px; }
+    .trv-in { flex:1; background:rgba(0,0,0,0.03); border:1px solid rgba(0,0,0,0.1); border-radius:8px; padding:6px 9px; font-size:0.82em; font-family:inherit; outline:none; color:#1a1a1a; }
+    .trv-in:focus { border-color:rgba(20,184,166,0.5); }
+    .trv-in::placeholder { color:#999; }
+
+    #setup-ov { position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(10px); z-index:2000; display:none; align-items:center; justify-content:center; padding:18px; }
+    .setup-card { background:white; border:1px solid rgba(0,0,0,0.06); border-radius:20px; padding:24px; max-width:460px; width:100%; box-shadow:0 24px 64px rgba(0,0,0,0.15); }
+    .setup-card h2 { font-size:1.1em; font-weight:700; color:#1a1a1a; margin-bottom:10px; }
+    .setup-card p,.setup-card li { font-size:0.81em; color:#555; line-height:1.65; }
+    .setup-card ol { padding-left:16px; margin:10px 0 14px; }
+    .setup-card code { background:rgba(20,184,166,0.12); color:var(--teal); padding:1px 5px; border-radius:4px; font-size:0.9em; }
+
+    .toast { position:fixed; bottom:60px; left:50%; transform:translateX(-50%); background:white; border:1px solid rgba(0,0,0,0.06); color:#1a1a1a; padding:10px 18px; border-radius:20px; font-size:0.82em; z-index:3000; box-shadow:0 6px 24px rgba(0,0,0,0.12); pointer-events:none; animation:fsld .28s ease; }
+    @media (max-width: 720px) { .toast { bottom: calc(56px + env(safe-area-inset-bottom) + 16px); } }
+    @keyframes fsld { from{opacity:0;transform:translateX(-50%) translateY(8px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+
+    .empty { text-align:center; padding:24px; color:var(--muted); font-size:0.81em; }
+    ::-webkit-scrollbar { width:6px; }
+    ::-webkit-scrollbar-thumb { background:rgba(0,0,0,0.15); border-radius:3px; }
+
+    /* Leaflet overrides */
+    .leaflet-control-zoom a { background:rgba(255,255,255,0.95)!important; backdrop-filter:blur(10px)!important; border-color:rgba(0,0,0,0.08)!important; color:#555!important; }
+    .leaflet-control-zoom a:hover { background:white!important; color:#1a1a1a!important; }
+    .leaflet-control-attribution { background:rgba(255,255,255,0.9)!important; color:#888!important; font-size:0.58em!important; }
+    .leaflet-control-attribution a { color:var(--teal)!important; }
+  </style>
+</head>
+<body>
+
+<!-- Firebase Setup -->
+<div id="setup-ov" style="display:none">
+  <div class="setup-card">
+    <h2>🔧 Firebase Setup (one-time)</h2>
+    <p>To sync in real time across all 5 travelers, connect a free Firebase Realtime Database:</p>
+    <ol>
+      <li>Go to <strong style="color:#1a1a1a">console.firebase.google.com</strong></li>
+      <li>Add project → name it <code>maui-wowie-2026</code></li>
+      <li>Build → Realtime Database → Create → <strong style="color:#1a1a1a">Start in test mode</strong></li>
+      <li>Project Settings ⚙️ → Your apps → Add web app → copy <code>firebaseConfig</code></li>
+      <li>Paste config values into <code>FIREBASE_CONFIG</code> in the script section</li>
+    </ol>
+    <button class="btn-p" onclick="dismissSetup()" style="margin-top:0">Use local mode for now</button>
+  </div>
+</div>
+
+<!-- Name Picker -->
+<div class="ov" id="nm-ov">
+  <div class="modal">
+    <div style="font-size:2em;margin-bottom:6px">🏝️</div>
+    <div class="modal-t" style="text-align:center">Who are you?</div>
+    <p style="font-size:0.81em;color:var(--muted);margin-bottom:10px">Pick your name so the crew knows who's talking!</p>
+    <div class="nm-grid" id="nm-grid"></div>
+    <p style="font-size:0.71em;color:var(--muted);margin-top:4px">Or type a custom name:</p>
+    <input type="text" id="nm-custom" class="fi" style="margin-top:5px;text-align:center" placeholder="Your name…">
+    <button class="btn-p" onclick="setName()">Let's go 🤙</button>
+  </div>
+</div>
+
+<!-- Add / Edit Activity -->
+<div class="ov" id="act-ov">
+  <div class="modal">
+    <div class="modal-t" id="act-title">💡 Add Suggestion</div>
+    <div class="fg"><label class="fl">Activity Name *</label><input type="text" id="f-name" class="fi" placeholder="e.g. Snorkeling at Honolua Bay"></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Day</label>
+        <select id="f-day" class="fsel">
+          <option value="unscheduled">No date</option>
+          <option value="tue">Tue 3/10 · Arrival</option><option value="wed">Wed 3/11 · Hana</option>
+          <option value="thu">Thu 3/12 · Haleakalā</option><option value="fri">Fri 3/13 · Whale Watch</option>
+          <option value="sat">Sat 3/14 · Iao + Sail</option><option value="sun">Sun 3/15 · Departure</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Time</label><input type="text" id="f-time" class="fi" placeholder="e.g. 9:00 AM"></div>
+    </div>
+    <div class="fg"><label class="fl">Category</label>
+      <select id="f-tag" class="fsel"><option value="activity">⚡ Activity</option><option value="food">🍴 Food</option><option value="logistics">📌 Logistics</option></select>
+    </div>
+    <div class="fg"><label class="fl">Description / Notes</label><textarea id="f-note" class="fta" placeholder="Cost, tips, booking info…"></textarea></div>
+    <div class="fg"><label class="fl">Photo URL (optional)</label><input type="url" id="f-photo" class="fi" placeholder="https://…"></div>
+    <button class="btn-p" onclick="saveAct()">Save</button>
+    <button class="btn-s" onclick="closeActOv()">Cancel</button>
+    <button class="btn-d" id="del-btn" onclick="deleteAct()" style="display:none">🗑 Delete Activity</button>
+  </div>
+</div>
+
+<!-- Settings -->
+<div class="ov" id="cfg-ov">
+  <div class="modal">
+    <div class="modal-t">⚙️ Trip Settings</div>
+    <p style="font-size:0.79em;color:var(--muted);margin-bottom:12px">All listed travelers must approve a suggestion before it becomes an official itinerary item.</p>
+    <div id="trv-list"></div>
+    <button class="btn-p" onclick="saveCfg()">Save Settings</button>
+    <button class="btn-s" onclick="closeCfg()">Cancel</button>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app">
+  <div id="hdr">
+    <div>
+      <h1>🏝️ Maui Wowie 2026</h1>
+      <div class="sub">March 10–15 · Master Schedule · 6 Days in Paradise</div>
+    </div>
+    <div class="hdr-r">
+      <button class="ibtn" id="notes-btn" onclick="toggleNotesPanel()" title="Group chat">💬</button>
+      <div class="chip" onclick="showNamePicker()">👤 <span id="user-disp">…</span></div>
+      <button class="ibtn" onclick="showCfg()">⚙️</button>
+    </div>
+  </div>
+
+  <div id="tabs">
+    <button class="tab on" data-d="all" onclick="setDay('all',this)">🗺 All Days</button>
+    <button class="tab" data-d="tue" onclick="setDay('tue',this)">✈️ Tue 3/10</button>
+    <button class="tab" data-d="wed" onclick="setDay('wed',this)">🌿 Wed 3/11</button>
+    <button class="tab" data-d="thu" onclick="setDay('thu',this)">🌋 Thu 3/12</button>
+    <button class="tab" data-d="fri" onclick="setDay('fri',this)">🐋 Fri 3/13</button>
+    <button class="tab" data-d="sat" onclick="setDay('sat',this)">⛵ Sat 3/14</button>
+    <button class="tab" data-d="sun" onclick="setDay('sun',this)">🏠 Sun 3/15</button>
+  </div>
+
+  <div id="mw">
+    <!-- LEFT: Always-visible list panel -->
+    <div id="lp">
+      <div class="lp-handle"></div>
+      <div class="lp-hd">
+        <span class="lp-title" id="lp-title">📋 Schedule</span>
+        <button class="lp-add" onclick="openAdd()">+ Add</button>
+        <button class="lp-close" onclick="setMobileView('map')">✕</button>
+      </div>
+      <div class="lp-body" id="lp-body"></div>
+    </div>
+
+    <!-- RIGHT: Map + overlays -->
+    <div id="mw-r">
+      <div id="map"></div>
+      <div id="pick-banner">📍 Tap the map to place the pin · ESC to cancel</div>
+      <div id="legend">
+        <div class="lg-r"><div class="lg-d" style="background:var(--cyan)"></div>Approved</div>
+        <div class="lg-r"><div class="lg-d lg-pulse" style="background:var(--sugg)"></div>Suggestion</div>
+        <div class="lg-r"><div class="lg-d" style="background:var(--d-wed);opacity:0.7"></div><span style="color:var(--muted)">- -</span> Hana Route</div>
+      </div>
+      <button id="list-toggle-btn" onclick="toggleLP()">📋 Schedule</button>
+      <button id="fab" onclick="openAdd()">+ Suggest Activity</button>
+
+    </div>
+  </div>
+</div>
+
+<!-- Detail Panel — fixed outside map to avoid Leaflet stacking context -->
+<div id="dp">
+  <div class="dp-img">
+    <div class="dp-img-bg" id="dp-img"></div>
+    <button class="dp-close" onclick="closeDP()">✕</button>
+    <div class="dp-nav">
+      <button class="dp-nb" onclick="navAct(-1)">‹</button>
+      <span class="dp-ctr" id="dp-ctr">1 of 1</span>
+      <button class="dp-nb" onclick="navAct(1)">›</button>
+    </div>
+  </div>
+  <div class="dp-body" id="dp-body"></div>
+</div>
+
+<!-- Notes panel — outside app so it floats above map -->
+<div id="notes-panel">
+  <div class="notes-hd">
+    <span>💬 Group Chat</span>
+    <button class="notes-close" onclick="toggleNotesPanel()">✕</button>
+  </div>
+  <div class="notes-body" id="notes-body"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script>
+// ══════════════════════════════════════════════════════════════
+//  FIREBASE CONFIG
+// ══════════════════════════════════════════════════════════════
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyCXDZGq0T2yI7t0LlVLOWGCuxvCR1AeRPg",
+  authDomain:        "maui-wowie-2026.firebaseapp.com",
+  databaseURL:       "https://maui-wowie-2026-default-rtdb.firebaseio.com",
+  projectId:         "maui-wowie-2026",
+  storageBucket:     "maui-wowie-2026.firebasestorage.app",
+  messagingSenderId: "969011598703",
+  appId:             "1:969011598703:web:466890a83333c4657f849a"
+};
+
+// ══════════════════════════════════════════════════════════════
+//  SEED DATA
+// ══════════════════════════════════════════════════════════════
+const SEED = [
+  { id:'a1', name:'K/J/B land 🛬',                   day:'tue', time:'10:40 AM', tag:'logistics', note:'First crew arrives at OGG. Grab bags & head to Turo pickup.',                                                                   lat:20.8986, lng:-156.4305 },
+  { id:'a2', name:'Pick up Turo + Grocery Run',       day:'tue', time:'12:00 PM', tag:'logistics', note:'Pick up the rental car, then hit Foodland Kihei for snacks, drinks & Dramamine for Hana.',                                      lat:20.7589, lng:-156.4435 },
+  { id:'a3', name:'T/L/E land 🛬',                    day:'tue', time:'2:40 PM',  tag:'logistics', note:'Second crew arrives at OGG. Head to Kihei after bags.',                                                                         lat:20.8986, lng:-156.4305 },
+  { id:'a4', name:'Check in Airbnb',                  day:'tue', time:'3:30 PM',  tag:'logistics', note:'Home base all week. 2191 S Kihei Rd — settle in and decompress!',                                                               lat:20.7201, lng:-156.4459 },
+  { id:'a5', name:'Dinner — South Kihei Food Trucks', day:'tue', time:'Evening',  tag:'food',      note:'Easy first-night dinner at the South Kihei food truck park. Cash-friendly, no reservations needed.',                            lat:20.7397, lng:-156.4453 },
+  { id:'b1', name:'Leave Kihei',                      day:'wed', time:'6:30 AM',  tag:'logistics', note:'EARLY start! Fill gas tank the night before. Pack towels, water, snacks & Dramamine.',                                         lat:20.7201, lng:-156.4459 },
+  { id:'b2', name:'Twin Falls',                       day:'wed', time:'7:15 AM',  tag:'activity',  note:'Mile 2 · $10 parking · Quick waterfall hike ~30 min. Beautiful and easy trail.',                                               lat:20.9114, lng:-156.2940 },
+  { id:'b3', name:'Rainbow Eucalyptus Trees',         day:'wed', time:'8:00 AM',  tag:'activity',  note:'Mile 7 · Free roadside stop on the LEFT. Stunning painted-bark trees — quick photo stop.',                                     lat:20.8834, lng:-156.2680 },
+  { id:'b4', name:'Garden of Eden Arboretum',         day:'wed', time:'8:30 AM',  tag:'activity',  note:'Mile 10 · $20/person · Best bathrooms on the route + incredible ocean views. ~45 min.',                                        lat:20.8985, lng:-156.2580 },
+  { id:'b5', name:"Ke'anae — Auntie Sandy's 🍌",     day:'wed', time:'10:30 AM', tag:'food',      note:"Mile 14 · Auntie Sandy's Famous Banana Bread — CASH ONLY. Get here before it sells out!",                                     lat:20.9025, lng:-156.2080 },
+  { id:'b6', name:"Pua'a Ka'a Falls",                 day:'wed', time:'12:00 PM', tag:'activity',  note:'Mile 22 · Free roadside waterfall with a swim spot. Quick stop ~20 min.',                                                       lat:20.8218, lng:-156.1820 },
+  { id:'b7', name:'Nahiku Marketplace',               day:'wed', time:'12:45 PM', tag:'food',      note:'Mile 25 · Quick snacks & fresh fruit from local vendors. Grab lunch here.',                                                     lat:20.8680, lng:-156.1580 },
+  { id:'b8', name:"⭐ Wai'ānapanapa Black Sand Beach",day:'wed', time:'2:30 PM',  tag:'activity',  note:'Mile 32 · RESERVATION REQUIRED ✅ Already booked! Black volcanic sand, sea arches & blowholes. ~1.5 hrs.',                    lat:20.7858, lng:-156.0580 },
+  { id:'b9', name:'Wailua Falls / Venus Pools',       day:'wed', time:'4:00 PM',  tag:'activity',  note:'Mile 34+ · Optional if time allows before 5 PM. Venus Pools has stunning tidal pools.',                                         lat:20.7520, lng:-156.0780 },
+  { id:'b10',name:"Return — Dinner: Zippy's",         day:'wed', time:'7:30 PM',  tag:'food',      note:"Return to Kihei by ~5:30 PM. Dinner at Zippy's — classic Hawaii comfort food.",                                                lat:20.8826, lng:-156.4589 },
+  { id:'c1', name:'Kihei Caffe',                      day:'thu', time:'7:00 AM',  tag:'food',      note:'Best cheap local breakfast on Maui. Expect a line — go early! Cash only.',                                                      lat:20.7449, lng:-156.4430 },
+  { id:'c2', name:'Beach & Pool Chill',               day:'thu', time:'10:00 AM', tag:'activity',  note:'Recovery morning! Relax at the Airbnb pool or walk to Kamaole Beach. Snorkel gear available.',                                 lat:20.7201, lng:-156.4459 },
+  { id:'c3', name:'Prep for the Cold',                day:'thu', time:'1:00 PM',  tag:'activity',  note:'Haleakalā summit is ~38°F at sunset — bring layers, jackets & blankets. Leave by 3:30 PM sharp!',                             lat:20.7456, lng:-156.4397 },
+  { id:'c4', name:'🌋 Haleakalā Sunset',              day:'thu', time:'3:30 PM',  tag:'activity',  note:'LEAVE BY 3:30 PM! ~2 hr drive to summit at 10,023 ft. Bring warm layers. One of the most spectacular views on Earth.',         lat:20.7089, lng:-156.2537 },
+  { id:'d1', name:'🐋 Whale Watch Tour',              day:'fri', time:'Morning',  tag:'activity',  note:'Maalaea Harbor — departs early. Peak humpback whale season! Book with Pacific Whale Foundation or Pride of Maui.',              lat:20.7867, lng:-156.5083 },
+  { id:'d2', name:'Paia Fish Market + Shopping',      day:'fri', time:'Afternoon',tag:'food',      note:'Best fish tacos on Maui. Walk the hippie shops of Paia town after lunch.',                                                      lat:20.9154, lng:-156.3689 },
+  { id:'d3', name:'Monkeypod Happy Hour 🍹',          day:'fri', time:'3:30 PM',  tag:'food',      note:'3:30–5:00 PM · Monkeypod Kitchen, Wailea. Best happy hour on Maui — $10 cocktails, live music.',                               lat:20.6878, lng:-156.4344 },
+  { id:'e1', name:'🌿 Iao Valley Hike',               day:'sat', time:'Morning',  tag:'activity',  note:'RESERVATION REQUIRED — book at hawaiistateparks.reserveamerica.com. Short scenic hike to the Iao Needle. ~1.5 hrs.',           lat:20.8810, lng:-156.5487 },
+  { id:'e2', name:'Pickleball or Snorkeling',         day:'sat', time:'Afternoon',tag:'activity',  note:'Choose your adventure! Pickleball courts at Kalama Park (free) OR snorkeling at Molokini Crater via boat tour.',               lat:20.7456, lng:-156.4397 },
+  { id:'e3', name:'🌅 Sunset Sail',                   day:'sat', time:'Evening',  tag:'activity',  note:'Sail Maui or Trilogy Excursions from Maalaea Harbor. ~2 hrs on the water, snacks & drinks included. BOOK AHEAD!',              lat:20.7867, lng:-156.5083 },
+  { id:'f1', name:'Gazebo or Kihei Farmers Market',  day:'sun', time:'7:00 AM',  tag:'food',      note:"Gazebo Restaurant (Napili, 40 min) for legendary mac nut pancakes — go EARLY. OR hit the Kihei Farmers Market for local eats.", lat:20.9990, lng:-156.6734 },
+  { id:'f2', name:'Last Stops / Souvenirs',           day:'sun', time:'11:00 AM', tag:'activity',  note:"Final shopping: Lahaina, Paia, or ABC Stores. Don't forget Maui coffee, macadamia nuts & sea salt.",                           lat:20.7456, lng:-156.4397 },
+  { id:'f3', name:'Return Turo',                      day:'sun', time:'7:00 PM',  tag:'logistics', note:'Return the car to OGG airport. Leave plenty of time — at least 2 hrs before flight.',                                           lat:20.8986, lng:-156.4305 },
+  { id:'f4', name:'✈️ Fly Home',                      day:'sun', time:'10:08 PM', tag:'logistics', note:'Mahalo! 🤙 See you on the mainland. Check-in closes ~8:30 PM.',                                                                 lat:20.8986, lng:-156.4305 },
+];
+
+// ══════════════════════════════════════════════════════════════
+//  CONSTANTS
+// ══════════════════════════════════════════════════════════════
+const DC = { tue:'#7eb8da', wed:'#81b29a', thu:'#b8a9c9', fri:'#e07a5f', sat:'#73d8c0', sun:'#e8c547', unscheduled:'#9e9e9e' };
+const DL = {
+  tue:'✈️ Tue 3/10 · Arrival',         wed:'🌿 Wed 3/11 · Road to Hana',
+  thu:'🌋 Thu 3/12 · Haleakalā Sunset', fri:'🐋 Fri 3/13 · Whale Watch + Paia',
+  sat:'⛵ Sat 3/14 · Iao + Sunset Sail', sun:'🏠 Sun 3/15 · Departure',
+  unscheduled:'📅 No date'
+};
+const IMG_GRAD = {
+  food:      'linear-gradient(145deg,#2d1a0f,#4a2a18,#6b3d20)',
+  activity:  'linear-gradient(145deg,#0f1f18,#1a3528,#254a38)',
+  logistics: 'linear-gradient(145deg,#0f1525,#1a2540,#253560)'
+};
+const HANA_IDS = ['b1','b2','b3','b4','b5','b6','b7','b8','b9'];
+
+// ══════════════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════════════
+let db = null, localMode = false;
+let curUser = null, curDay = 'all';
+let acts = {}, mkrs = {};
+let curId = null, visIds = [], editId = null;
+let pickMode = false, pickTarget = null;
+let travelers = ['Traveler 1','Traveler 2','Traveler 3','Traveler 4','Traveler 5'];
+let map = null, hanaLine = null;
+
+// ══════════════════════════════════════════════════════════════
+//  FIREBASE
+// ══════════════════════════════════════════════════════════════
+function initFB() {
+  if (FIREBASE_CONFIG.apiKey === 'YOUR_API_KEY') {
+    document.getElementById('setup-ov').style.display = 'flex'; return false;
+  }
+  try {
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.database();
+    return true;
+  } catch(e) { console.error('Firebase init failed:', e); return false; }
+}
+
+function dismissSetup() {
+  document.getElementById('setup-ov').style.display = 'none';
+  localMode = true; loadLocal();
+}
+
+function loadLocal() {
+  const sv = localStorage.getItem('mw_acts2');
+  const st = localStorage.getItem('mw_travelers');
+  if (st) { try { travelers = JSON.parse(st); } catch(e){} }
+  if (sv) { try { acts = JSON.parse(sv); } catch(e) { acts = {}; } }
+  if (!Object.keys(acts).length) {
+    SEED.forEach(s => { acts[s.id] = {...s, status:'approved', approvals:{}, notes:{}}; });
+    saveLocal();
+  }
+  renderAll();
+}
+
+function saveLocal() {
+  localStorage.setItem('mw_acts2', JSON.stringify(acts));
+  localStorage.setItem('mw_travelers', JSON.stringify(travelers));
+}
+
+function setupFBListeners() {
+  db.ref('config/travelers').on('value', snap => { if (snap.val()) travelers = snap.val(); });
+  db.ref('activities').on('value', snap => {
+    const data = snap.val();
+    if (!data) {
+      const batch = {};
+      SEED.forEach(s => { batch[s.id] = {...s, status:'approved', approvals:{}, notes:{}}; });
+      db.ref('activities').set(batch);
+      return;
+    }
+    acts = data;
+    renderAll();
+    if (curId && acts[curId]) renderDPBody(acts[curId]);
+    const np = document.getElementById('notes-panel');
+    if (np && np.classList.contains('open')) renderNotesPanel();
+    updateNotesUnreadGlow();
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+//  MAP
+// ══════════════════════════════════════════════════════════════
+function initMap() {
+  map = L.map('map', { center:[20.79,-156.34], zoom:11, zoomControl:false });
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution:'© OpenStreetMap © CARTO', subdomains:'abcd', maxZoom:19
+  }).addTo(map);
+  L.control.zoom({ position:'topright' }).addTo(map);
+  map.on('click', function(e) { if (pickMode) doPick(e.latlng); });
+}
+
+function mkIcon(a, num) {
+  const sugg = a.status === 'suggestion';
+  const c = sugg ? '#e07a5f' : (DC[a.day] || '#7eb8da');
+  const isAirbnb = a.id === 'a4' || (a.name && a.name.toLowerCase().includes('airbnb'));
+  if (isAirbnb) {
+    return L.divIcon({
+      className: 'mkr-icon mkr-house',
+      html: `<div style="width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:18px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.35));">🏠</div>`,
+      iconSize: [26,26], iconAnchor: [13,13]
+    });
+  }
+  const label = sugg ? '?' : (num || '·');
+  const shadow = sugg ? '0 2px 6px rgba(255,107,53,0.4)' : `0 2px 6px ${c}80`;
+  const pulse = sugg ? 'animation:mwp 2s infinite;' : '';
+  return L.divIcon({
+    className: 'mkr-icon',
+    html: `<div style="width:26px;height:26px;border-radius:50%;
+      background:${c};border:1.5px solid rgba(255,255,255,0.7);
+      box-shadow:${shadow};${pulse}
+      display:flex;align-items:center;justify-content:center;
+      color:white;font-size:9px;font-weight:700;
+      text-shadow:0 1px 1px rgba(0,0,0,0.5);box-sizing:border-box;">${label}</div>`,
+    iconSize: [26,26], iconAnchor: [13,13]
+  });
+}
+
+function offsetForStacked(lat, lng, index, total) {
+  if (total <= 1) return [lat, lng];
+  const deg = 0.00045;
+  const angle = (index / total) * Math.PI * 2;
+  const latOff = deg * Math.cos(angle);
+  const lngOff = (deg * Math.sin(angle)) / Math.cos(lat * Math.PI / 180);
+  return [lat + latOff, lng + lngOff];
+}
+
+function putMarker(a, num, stack) {
+  if (mkrs[a.id]) { try { map.removeLayer(mkrs[a.id]); } catch(e){} }
+  if (!a.lat || !a.lng) return;
+  try {
+    const stackIdx = stack ? stack.idx : 0;
+    const stackTotal = stack ? stack.total : 1;
+    const [lat, lng] = offsetForStacked(a.lat, a.lng, stackIdx, stackTotal);
+    const isAirbnb = a.id === 'a4' || (a.name && a.name.toLowerCase().includes('airbnb'));
+    const m = L.marker([lat, lng], { icon: mkIcon(a, num), zIndexOffset: isAirbnb ? 1000 : 0 });
+    m.on('click', function() { selectActivity(a.id); });
+    m.addTo(map);
+    mkrs[a.id] = m;
+    applyFilter(a.id);
+  } catch(e) { console.error('Marker error for', a.id, e); }
+}
+
+function applyFilter(id) {
+  const a = acts[id], m = mkrs[id];
+  if (!a || !m) return;
+  const isAirbnb = a.id === 'a4' || (a.name && a.name.toLowerCase().includes('airbnb'));
+  const show = curDay === 'all' || a.day === curDay || isAirbnb;
+  try {
+    if (show && !map.hasLayer(m)) map.addLayer(m);
+    if (!show && map.hasLayer(m)) map.removeLayer(m);
+  } catch(e){}
+}
+
+function drawHanaRoute() {
+  if (hanaLine) { try { map.removeLayer(hanaLine); } catch(e){} hanaLine = null; }
+  if (curDay !== 'all' && curDay !== 'wed') return;
+  const pts = HANA_IDS.map(id => acts[id]).filter(a => a && a.lat && a.lng).map(a => [a.lat, a.lng]);
+  if (pts.length < 2) return;
+  try {
+    hanaLine = L.polyline(pts, { color:'#4caf50', weight:2.5, dashArray:'7,11', opacity:0.55 }).addTo(map);
+  } catch(e){}
+}
+
+function syncMap() {
+  // Build day-sorted numbering first
+  const dayOrder = {};
+  ['tue','wed','thu','fri','sat','sun','unscheduled'].forEach(d => {
+    let i = 1;
+    Object.values(acts)
+      .filter(a => a.day === d)
+      .sort((a,b) => toMin(a.time) - toMin(b.time))
+      .forEach(a => { dayOrder[a.id] = i++; });
+  });
+  // Group activities at same location for pin offset
+  const key = (lat, lng) => (Math.round(lat * 10000) / 10000) + ',' + (Math.round(lng * 10000) / 10000);
+  const byLoc = {};
+  Object.values(acts).filter(a => a.lat && a.lng).forEach(a => {
+    const k = key(a.lat, a.lng);
+    if (!byLoc[k]) byLoc[k] = [];
+    byLoc[k].push(a);
+  });
+  const stackInfo = {};
+  Object.values(byLoc).forEach(arr => {
+    arr.sort((a, b) => (a.day || '').localeCompare(b.day || '') || toMin(a.time) - toMin(b.time));
+    arr.forEach((a, i) => { stackInfo[a.id] = { idx: i, total: arr.length }; });
+  });
+  // Remove stale markers
+  const known = new Set(Object.keys(acts));
+  Object.keys(mkrs).forEach(id => {
+    if (!known.has(id)) { try { map.removeLayer(mkrs[id]); } catch(e){} delete mkrs[id]; }
+  });
+  // Place/update markers
+  Object.values(acts).forEach(a => putMarker(a, dayOrder[a.id], stackInfo[a.id]));
+  drawHanaRoute();
+}
+
+function renderAll() {
+  syncMap();
+  renderLP();
+  updateNotesUnreadGlow();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  DAY FILTER
+// ══════════════════════════════════════════════════════════════
+function setDay(day, btn) {
+  curDay = day;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  btn.classList.add('on');
+  Object.keys(acts).forEach(id => applyFilter(id));
+  drawHanaRoute();
+  renderLP();
+  if (curId && acts[curId] && day !== 'all' && acts[curId].day !== day) closeDP();
+  if (day !== 'all') {
+    const pts = Object.values(acts).filter(a => a.day === day && a.lat && a.lng).map(a => [a.lat, a.lng]);
+    if (pts.length > 0) { try { map.fitBounds(L.latLngBounds(pts).pad(0.25)); } catch(e){} }
+  } else {
+    try { map.setView([20.79,-156.34], 11); } catch(e){}
+  }
+  // Update list panel title
+  document.getElementById('lp-title').textContent = day === 'all' ? '📋 Full Schedule' : `📋 ${DL[day] || day}`;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  LIST PANEL
+// ══════════════════════════════════════════════════════════════
+function toggleLP() {
+  if (window.innerWidth <= 720) {
+    toggleMobileLP();
+  } else {
+    document.getElementById('lp').classList.toggle('open');
+  }
+}
+
+function renderLP() {
+  const body = document.getElementById('lp-body');
+  const days = ['tue','wed','thu','fri','sat','sun','unscheduled'];
+  const list = Object.values(acts).filter(a => curDay === 'all' || a.day === curDay);
+
+  if (!list.length) { body.innerHTML = '<div class="empty">No activities yet!</div>'; return; }
+
+  const byDay = {};
+  list.forEach(a => { (byDay[a.day] = byDay[a.day] || []).push(a); });
+  Object.values(byDay).forEach(arr => arr.sort((a,b) => toMin(a.time) - toMin(b.time)));
+
+  const dayNum = {};
+  days.forEach(d => { let i=1; (byDay[d]||[]).forEach(a => { dayNum[a.id] = i++; }); });
+
+  let html = '';
+  days.filter(d => byDay[d]).forEach(d => {
+    html += `<div class="lp-day-hd" style="background:${DC[d]}18;color:${DC[d]}">
+      <span>${DL[d]}</span>
+      <button class="lp-day-add" onclick="event.stopPropagation();openAddForDay('${d}')" title="Add to this day">+</button>
+    </div>`;
+    byDay[d].forEach(a => {
+      const sugg = a.status === 'suggestion';
+      const col = sugg ? '#e07a5f' : (DC[a.day] || '#7eb8da');
+      const active = curId === a.id ? ' active' : '';
+      html += `
+        <div class="li${active}" id="li-${a.id}">
+          <div class="li-top" onclick="selectActivity('${a.id}')">
+            <div class="li-num" style="background:${col};box-shadow:0 0 8px ${col}60">${sugg ? '?' : dayNum[a.id]}</div>
+            <div class="li-info">
+              <div class="li-time">${esc(a.time)}</div>
+              <div class="li-name">${esc(a.name)}</div>
+            </div>
+            ${sugg ? `<span class="sugg-badge">💡</span>` : `<span class="li-tag t-${a.tag}">${tagEmoji(a.tag)}</span>`}
+          </div>
+          <div class="li-note ${a.note ? 'has-note' : ''}" onclick="toggleNoteEditor('${a.id}');event.stopPropagation()">
+            ${a.note ? esc(a.note) : '<em style="color:var(--muted);font-size:0.9em">+ add note…</em>'}
+          </div>
+          <div class="li-note-editor" id="ne-${a.id}">
+            <textarea class="li-note-ta" id="neta-${a.id}" placeholder="Add notes, tips, costs…" rows="3">${esc(a.note || '')}</textarea>
+            <div class="li-note-btns">
+              <button class="li-save" onclick="saveListNote('${a.id}')">Save</button>
+              <button class="li-cancel" onclick="toggleNoteEditor('${a.id}')">Cancel</button>
+            </div>
+          </div>
+          <div class="li-actions">
+            <button class="li-act-btn" onclick="event.stopPropagation();openEdit('${a.id}')">✏️ Edit</button>
+            <button class="li-act-btn del" onclick="event.stopPropagation();deleteActDirect('${a.id}')">🗑 Delete</button>
+          </div>
+        </div>`;
+    });
+  });
+
+  body.innerHTML = html;
+}
+
+function tagEmoji(tag) {
+  return { food:'🍴', activity:'⚡', logistics:'📌' }[tag] || '·';
+}
+
+function toggleNoteEditor(id) {
+  const ed = document.getElementById(`ne-${id}`);
+  if (!ed) return;
+  const isOpen = ed.classList.toggle('open');
+  if (isOpen) {
+    const ta = document.getElementById(`neta-${id}`);
+    if (ta) { ta.focus(); ta.selectionStart = ta.selectionEnd = ta.value.length; }
+  }
+}
+
+function saveListNote(id) {
+  const ta = document.getElementById(`neta-${id}`);
+  if (!ta) return;
+  doUpdate(id, { note: ta.value.trim() });
+  toggleNoteEditor(id);
+  toast('📝 Note saved!');
+}
+
+// ══════════════════════════════════════════════════════════════
+//  SELECT ACTIVITY (click from list OR map pin)
+// ══════════════════════════════════════════════════════════════
+function selectActivity(id) {
+  if (!id || !acts[id]) { console.warn('selectActivity: not found', id); return; }
+  // Highlight in list
+  document.querySelectorAll('.li').forEach(el => el.classList.remove('active'));
+  const liEl = document.getElementById(`li-${id}`);
+  if (liEl) { liEl.classList.add('active'); liEl.scrollIntoView({ behavior:'smooth', block:'nearest' }); }
+  // Open detail panel — stay on current view (Schedule or Map) when closing
+  openDP(id);
+}
+
+// ══════════════════════════════════════════════════════════════
+//  DETAIL PANEL
+// ══════════════════════════════════════════════════════════════
+function openDP(id) {
+  if (!acts[id]) return;
+  curId = id;
+  const a = acts[id];
+  visIds = Object.values(acts)
+    .filter(x => curDay === 'all' || x.day === curDay)
+    .sort((x,y) => x.day < y.day ? -1 : x.day > y.day ? 1 : toMin(x.time) - toMin(y.time))
+    .map(x => x.id);
+  const i = visIds.indexOf(id);
+  document.getElementById('dp-ctr').textContent = `${i+1} of ${visIds.length}`;
+  document.getElementById('dp-img').style.background = a.photo
+    ? `url(${a.photo}) center/cover no-repeat`
+    : (IMG_GRAD[a.tag] || IMG_GRAD.activity);
+  renderDPBody(a);
+  document.getElementById('dp').classList.add('open');
+  if (a.lat && a.lng) { try { map.panTo([a.lat, a.lng], {animate:true, duration:0.5}); } catch(e){} }
+}
+
+function renderDPBody(a) {
+  if (!a) return;
+  const sugg = a.status === 'suggestion';
+  const col = DC[a.day] || '#7eb8da';
+  const apprvs = a.approvals || {};
+  const approved = Object.entries(apprvs).filter(([,v]) => v).map(([k]) => k);
+  const need = travelers.filter(t => t.trim()).length || 5;
+  const full = approved.length >= need;
+  const myOk = curUser && apprvs[curUser] === true;
+  const pct = Math.min(100, Math.round((approved.length / need) * 100));
+  const notes = a.notes || {};
+  const nl = Object.values(notes).sort((x,y) => (x.ts||0) - (y.ts||0));
+  const mileBadge = HANA_IDS.includes(a.id) ? `<span class="mile-badge">🌿 Road to Hana</span>` : '';
+
+  document.getElementById('dp-body').innerHTML = `
+    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
+      <span class="badge" style="background:${col}22;color:${col};border-color:${col}55">${DL[a.day]||a.day}</span>
+      <span class="badge ${sugg?'badge-s':'badge-a'}">${sugg?'💡 Suggestion':'✓ Approved'}</span>
+      ${mileBadge}
+    </div>
+    <div class="dp-title">${esc(a.name)}</div>
+    <div class="meta-r">
+      <span class="meta-t">⏰ ${esc(a.time)}</span>
+      <span class="li-tag t-${a.tag}" style="font-size:0.7em;padding:2px 7px">${tagEmoji(a.tag)} ${tagLbl(a.tag)}</span>
+    </div>
+
+    <div class="sec">
+      <div class="sec-h">Trip Notes</div>
+      <div class="tnote" id="tn-${a.id}" onclick="editTripNote('${a.id}')">
+        ${a.note ? esc(a.note) : '<em style="color:var(--muted)">Tap to add notes…</em>'}
+        <span class="eh">✏️</span>
+      </div>
+    </div>
+
+    ${sugg ? `<div class="sec">
+      <div class="sec-h">Group Approval — ${approved.length}/${need} needed</div>
+      <div class="av-box">
+        <div class="av-bar-r"><div class="av-bar"><div class="av-fill" style="width:${pct}%"></div></div><span class="av-ct">${approved.length}/${need}</span></div>
+        ${approved.length ? `<div class="av-chips">${approved.map(n=>`<span class="av-chip">✓ ${esc(n)}</span>`).join('')}</div>` : ''}
+        ${full ? `<div class="av-full">🎉 Fully approved — added to itinerary!</div>`
+               : myOk ? `<button class="av-btn done">✓ You approved this</button>`
+               : `<button class="av-btn" onclick="doApprove('${a.id}')">👍 Approve this suggestion</button>`}
+      </div>
+    </div>` : ''}
+
+    <div class="sec">
+      <div class="sec-h">Group Notes (${nl.length})</div>
+      <div class="cmt-list">
+        ${nl.length ? nl.map(n=>`
+          <div class="cmt">
+            <div class="cmt-hd">
+              <div class="cmt-av" style="background:${strCol(n.author||'')}">${inits(n.author||'?')}</div>
+              <span class="cmt-who">${esc(n.author||'Anonymous')}</span>
+              <span class="cmt-when">${fmtTs(n.ts)}</span>
+            </div>
+            <div class="cmt-txt">${esc(n.text)}</div>
+          </div>`).join('')
+          : `<div style="color:var(--muted);font-size:0.78em;text-align:center;padding:6px">No notes yet — be the first! 👇</div>`}
+      </div>
+      <div class="cmt-row">
+        <textarea class="cmt-in" id="cin-${a.id}" placeholder="Add a group note…" rows="1" onkeydown="ckey(event,'${a.id}')"></textarea>
+        <button class="cmt-send" onclick="addCmt('${a.id}')">↑</button>
+      </div>
+    </div>
+
+    <button class="edit-btn" onclick="openEdit('${a.id}')">✏️ Edit Activity Details</button>
+  `;
+}
+
+function closeDP() {
+  document.getElementById('dp').classList.remove('open');
+  document.querySelectorAll('.li').forEach(el => el.classList.remove('active'));
+  curId = null;
+}
+
+function navAct(dir) {
+  const i = visIds.indexOf(curId); if (i === -1) return;
+  selectActivity(visIds[(i + dir + visIds.length) % visIds.length]);
+}
+
+// ══════════════════════════════════════════════════════════════
+//  TRIP NOTE EDIT (in detail panel)
+// ══════════════════════════════════════════════════════════════
+function editTripNote(id) {
+  const el = document.getElementById(`tn-${id}`); if (!el) return;
+  el.onclick = null;
+  el.innerHTML = `
+    <textarea class="tnote-ta" id="tnta">${esc(acts[id]?.note||'')}</textarea>
+    <button class="save-nb" onclick="saveTripNote('${id}')">Save</button>
+    <button class="save-nb" onclick="renderDPBody(acts['${id}'])" style="background:rgba(255,255,255,0.08);color:var(--muted);border-color:var(--bdr);margin-left:5px">Cancel</button>
+  `;
+  const ta = document.getElementById('tnta');
+  if (ta) { ta.focus(); ta.selectionStart = ta.selectionEnd = ta.value.length; }
+}
+function saveTripNote(id) {
+  const ta = document.getElementById('tnta'); if (!ta) return;
+  doUpdate(id, { note: ta.value.trim() });
+}
+
+// ══════════════════════════════════════════════════════════════
+//  COMMENTS
+// ══════════════════════════════════════════════════════════════
+function ckey(e, id) { if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); addCmt(id); } }
+function addCmt(id) {
+  const el = document.getElementById(`cin-${id}`);
+  if (!el || !el.value.trim()) return;
+  if (!curUser) { showNamePicker(); return; }
+  const nid = 'n' + Date.now();
+  const n = { text: el.value.trim(), author: curUser, ts: Date.now() };
+  if (db) { db.ref(`activities/${id}/notes/${nid}`).set(n); }
+  else {
+    if (!acts[id].notes) acts[id].notes = {};
+    acts[id].notes[nid] = n;
+    saveLocal(); renderDPBody(acts[id]); renderLP();
+  }
+  el.value = '';
+  updateNotesUnreadGlow();
+  const p = document.getElementById('notes-panel');
+  if (p && p.classList.contains('open')) renderNotesPanel();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  NOTES / NOTIFICATIONS PANEL
+// ══════════════════════════════════════════════════════════════
+const NOTES_LAST_VIEWED_KEY = 'mw2026_last_notes_viewed';
+function getLatestNoteTs() {
+  let latest = 0;
+  Object.values(acts).forEach(a => {
+    const notes = a.notes || {};
+    Object.values(notes).forEach(n => { if (n && n.ts) latest = Math.max(latest, n.ts); });
+  });
+  return latest;
+}
+function updateNotesUnreadGlow() {
+  const btn = document.getElementById('notes-btn');
+  if (!btn) return;
+  const latest = getLatestNoteTs();
+  const lastViewed = parseInt(localStorage.getItem(NOTES_LAST_VIEWED_KEY) || '0', 10);
+  if (latest > lastViewed) btn.classList.add('has-unread');
+  else btn.classList.remove('has-unread');
+}
+function toggleNotesPanel() {
+  const p = document.getElementById('notes-panel');
+  if (p.classList.contains('open')) {
+    p.classList.remove('open');
+    document.removeEventListener('click', onNotesClickOutside);
+  } else {
+    const latest = getLatestNoteTs();
+    localStorage.setItem(NOTES_LAST_VIEWED_KEY, String(Math.max(Date.now(), latest)));
+    updateNotesUnreadGlow();
+    renderNotesPanel();
+    p.classList.add('open');
+    setTimeout(() => document.addEventListener('click', onNotesClickOutside), 0);
+  }
+}
+function onNotesClickOutside(e) {
+  const btn = document.getElementById('notes-btn');
+  const panel = document.getElementById('notes-panel');
+  if (panel && !panel.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+    panel.classList.remove('open');
+    document.removeEventListener('click', onNotesClickOutside);
+  }
+}
+function startThreadFromPanel() {
+  const actSelect = document.getElementById('notes-start-act');
+  const input = document.getElementById('notes-start-in');
+  if (!actSelect || !input || !input.value.trim()) return;
+  const actId = actSelect.value;
+  if (!actId) return;
+  replyFromPanel(actId, 'notes-start-in');
+}
+function renderNotesPanel() {
+  const body = document.getElementById('notes-body');
+  const days = ['tue','wed','thu','fri','sat','sun','unscheduled'];
+  const actList = days.flatMap(d => (Object.values(acts).filter(a => a.day === d) || [])).filter(Boolean);
+  const startHtml = actList.length ? `
+    <div class="notes-start">
+      <div class="notes-start-h">Start new thread</div>
+      <div class="notes-start-row">
+        <select class="notes-start-act" id="notes-start-act">
+          <option value="">Pick an activity…</option>
+          ${actList.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join('')}
+        </select>
+        <input type="text" class="notes-reply-in" id="notes-start-in" placeholder="Type your message…" style="flex:1;min-width:140px"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();startThreadFromPanel()}">
+        <button class="notes-reply-btn" onclick="startThreadFromPanel()">Send</button>
+      </div>
+    </div>` : '';
+  const threads = {};
+  Object.entries(acts).forEach(([aid, a]) => {
+    const notes = a.notes || {};
+    const list = Object.entries(notes).map(([nid, n]) => ({ nid, ...n }));
+    if (list.length) {
+      list.sort((x, y) => (x.ts || 0) - (y.ts || 0));
+      const latest = Math.max(...list.map(n => n.ts || 0));
+      threads[aid] = { actName: a.name, notes: list, latest };
+    }
+  });
+  const sorted = Object.entries(threads).sort((a, b) => (b[1].latest || 0) - (a[1].latest || 0));
+  const emptyMsg = actList.length ? 'No threads yet.<br>Start one above!' : 'No activities yet.<br>Add a suggestion first!';
+  const threadsHtml = sorted.length ? sorted.map(([actId, t]) => {
+    const rid = 'nr-' + actId;
+    const msgs = t.notes.map((n, i) => `
+      <div class="notes-msg ${i > 0 ? 'reply' : ''}">
+        <div class="notes-msg-txt">${esc(n.text || '')}</div>
+        <div class="notes-msg-meta">${esc(n.author || '?')} · ${fmtTs(n.ts)}</div>
+      </div>`).join('');
+    return `
+    <div class="notes-thread">
+      <div class="notes-thread-hd" onclick="closeNotesAndOpen('${actId}')">📍 ${esc(t.actName)}</div>
+      ${msgs}
+      <div class="notes-reply-row">
+        <input type="text" class="notes-reply-in" id="${rid}" placeholder="Reply to this conversation…" onkeydown="if(event.key==='Enter'){event.preventDefault();replyFromPanel('${actId}','${rid}')}">
+        <button class="notes-reply-btn" onclick="replyFromPanel('${actId}','${rid}')">Send</button>
+      </div>
+    </div>`;
+  }).join('') : `<div class="notes-empty">${emptyMsg}</div>`;
+  body.innerHTML = startHtml + threadsHtml;
+}
+function replyFromPanel(actId, inputId) {
+  const el = document.getElementById(inputId);
+  if (!el || !el.value.trim()) return;
+  if (!curUser) { showNamePicker(); return; }
+  const text = el.value.trim();
+  const nid = 'n' + Date.now();
+  const n = { text, author: curUser, ts: Date.now() };
+  if (db) { db.ref(`activities/${actId}/notes/${nid}`).set(n); }
+  else {
+    if (!acts[actId].notes) acts[actId].notes = {};
+    acts[actId].notes[nid] = n;
+    saveLocal();
+    if (curId === actId) renderDPBody(acts[actId]);
+    renderLP();
+  }
+  el.value = '';
+  const p = document.getElementById('notes-panel');
+  if (p && p.classList.contains('open')) {
+    localStorage.setItem(NOTES_LAST_VIEWED_KEY, String(Date.now()));
+    updateNotesUnreadGlow();
+  }
+  renderNotesPanel();
+}
+function closeNotesAndOpen(actId) {
+  document.getElementById('notes-panel').classList.remove('open');
+  document.removeEventListener('click', onNotesClickOutside);
+  selectActivity(actId);
+}
+
+// ══════════════════════════════════════════════════════════════
+//  APPROVALS
+// ══════════════════════════════════════════════════════════════
+function doApprove(id) {
+  if (!curUser) { showNamePicker(); return; }
+  if (db) {
+    db.ref(`activities/${id}/approvals/${curUser}`).set(true).then(() => {
+      db.ref(`activities/${id}`).once('value').then(s => checkFull(id, s.val()));
+    });
+  } else {
+    if (!acts[id].approvals) acts[id].approvals = {};
+    acts[id].approvals[curUser] = true;
+    checkFull(id, acts[id]); saveLocal(); renderDPBody(acts[id]);
+  }
+}
+function checkFull(id, a) {
+  const need = travelers.filter(t=>t.trim()).length || 5;
+  const cnt = Object.values(a.approvals||{}).filter(Boolean).length;
+  if (cnt >= need && a.status === 'suggestion') {
+    doUpdate(id, {status:'approved'}); toast('🎉 Fully approved — added to the itinerary!');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  ADD / EDIT ACTIVITY
+// ══════════════════════════════════════════════════════════════
+function openAdd() {
+  if (!curUser) { showNamePicker(); return; }
+  editId = null;
+  document.getElementById('act-title').textContent = '💡 Add Suggestion';
+  ['f-name','f-time','f-note','f-photo'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('f-day').value = curDay !== 'all' ? curDay : 'unscheduled';
+  document.getElementById('f-tag').value = 'activity';
+  document.getElementById('del-btn').style.display = 'none';
+  document.getElementById('act-ov').classList.add('open');
+}
+function openAddForDay(day) {
+  if (!curUser) { showNamePicker(); return; }
+  editId = null;
+  document.getElementById('act-title').textContent = '💡 Add Activity';
+  ['f-name','f-time','f-note','f-photo'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('f-day').value = day;
+  document.getElementById('f-tag').value = 'activity';
+  document.getElementById('del-btn').style.display = 'none';
+  document.getElementById('act-ov').classList.add('open');
+}
+function deleteActDirect(id) {
+  if (!confirm('Delete this activity?')) return;
+  if (db) { db.ref(`activities/${id}`).remove(); }
+  else {
+    if (mkrs[id]) { try { map.removeLayer(mkrs[id]); } catch(e){} delete mkrs[id]; }
+    delete acts[id]; saveLocal(); renderAll();
+  }
+  if (curId === id) closeDP();
+  toast('🗑 Deleted.');
+}
+function openEdit(id) {
+  const a = acts[id]; if (!a) return;
+  if (curId === id) closeDP();
+  editId = id;
+  document.getElementById('act-title').textContent = '✏️ Edit Activity';
+  document.getElementById('f-name').value  = a.name;
+  document.getElementById('f-day').value   = a.day;
+  document.getElementById('f-time').value  = a.time;
+  document.getElementById('f-tag').value   = a.tag;
+  document.getElementById('f-note').value  = a.note || '';
+  document.getElementById('f-photo').value = a.photo || '';
+  document.getElementById('del-btn').style.display = 'block';
+  document.getElementById('act-ov').classList.add('open');
+}
+function closeActOv() { document.getElementById('act-ov').classList.remove('open'); editId = null; }
+function saveAct() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { alert('Please enter an activity name'); return; }
+  const data = {
+    name, day: document.getElementById('f-day').value,
+    time: document.getElementById('f-time').value || 'TBD',
+    tag:  document.getElementById('f-tag').value,
+    note: document.getElementById('f-note').value.trim(),
+    photo:document.getElementById('f-photo').value.trim(),
+  };
+  if (editId) { doUpdate(editId, data); closeActOv(); toast('✅ Activity updated!'); }
+  else {
+    const id = 'x' + Date.now();
+    const nid = 'n' + Date.now();
+    const notifNote = { text: `💡 New suggestion: ${name}`, author: curUser || 'Anonymous', ts: Date.now() };
+    const full = {...data, id, status:'suggestion', addedBy:curUser||'Anonymous', approvals:{}, notes:{ [nid]: notifNote }, lat:20.798, lng:-156.34};
+    if (db) { db.ref(`activities/${id}`).set(full); }
+    else {
+      acts[id]=full; saveLocal(); renderAll();
+    }
+    closeActOv(); toast('💡 Suggestion added! Tap the map to place its pin.');
+    setTimeout(() => startPick(id), 400);
+    updateNotesUnreadGlow();
+  }
+}
+function deleteAct() {
+  if (!editId || !confirm('Delete this activity?')) return;
+  if (db) { db.ref(`activities/${editId}`).remove(); }
+  else {
+    if (mkrs[editId]) { try { map.removeLayer(mkrs[editId]); } catch(e){} delete mkrs[editId]; }
+    delete acts[editId]; saveLocal(); renderAll();
+  }
+  if (curId === editId) closeDP();
+  closeActOv(); toast('🗑 Deleted.');
+}
+function doUpdate(id, updates) {
+  if (db) { db.ref(`activities/${id}`).update(updates); }
+  else {
+    Object.entries(updates).forEach(([k,v]) => {
+      const parts = k.split('/'); let obj = acts[id];
+      parts.slice(0,-1).forEach(p => { if (!obj[p]) obj[p]={}; obj=obj[p]; });
+      obj[parts[parts.length-1]] = v;
+    });
+    saveLocal(); renderAll();
+    if (curId === id) renderDPBody(acts[id]);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  LOCATION PICK MODE
+// ══════════════════════════════════════════════════════════════
+function startPick(id) {
+  pickMode = true; pickTarget = id;
+  document.getElementById('pick-banner').classList.add('on');
+  document.addEventListener('keydown', onEscPick);
+}
+function onEscPick(e) { if (e.key==='Escape') endPick(); }
+function endPick() {
+  pickMode = false; pickTarget = null;
+  document.getElementById('pick-banner').classList.remove('on');
+  document.removeEventListener('keydown', onEscPick);
+}
+function doPick(ll) { doUpdate(pickTarget, {lat:ll.lat,lng:ll.lng}); endPick(); toast('📍 Pin placed!'); }
+
+// ══════════════════════════════════════════════════════════════
+//  NAME PICKER
+// ══════════════════════════════════════════════════════════════
+function showNamePicker() {
+  document.getElementById('nm-grid').innerHTML = travelers.filter(t=>t.trim()).map(t =>
+    `<div class="nm-opt ${curUser===t?'sel':''}" onclick="pickNm(this,'${t}')">${t}</div>`
+  ).join('');
+  document.getElementById('nm-custom').value = curUser || '';
+  document.getElementById('nm-ov').classList.add('open');
+}
+function pickNm(el, name) {
+  document.querySelectorAll('.nm-opt').forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('nm-custom').value = name;
+}
+function setName() {
+  const n = document.getElementById('nm-custom').value.trim();
+  if (!n) { alert('Please pick or type your name!'); return; }
+  curUser = n; localStorage.setItem('mw_user', n);
+  document.getElementById('user-disp').textContent = n;
+  document.getElementById('nm-ov').classList.remove('open');
+  toast(`Welcome, ${n}! 🤙`);
+}
+
+// ══════════════════════════════════════════════════════════════
+//  SETTINGS
+// ══════════════════════════════════════════════════════════════
+function showCfg() {
+  const t = [...travelers]; while(t.length<5) t.push('');
+  document.getElementById('trv-list').innerHTML = t.map((n,i) =>
+    `<div class="trv-row"><span class="trv-n">${i+1}.</span><input type="text" class="trv-in" value="${esc(n)}" placeholder="Traveler ${i+1}'s name"></div>`
+  ).join('');
+  document.getElementById('cfg-ov').classList.add('open');
+}
+function saveCfg() {
+  travelers = [...document.querySelectorAll('.trv-in')].map(i=>i.value.trim()).filter(Boolean);
+  if (db) db.ref('config/travelers').set(travelers);
+  else localStorage.setItem('mw_travelers', JSON.stringify(travelers));
+  closeCfg(); toast('Settings saved!');
+}
+function closeCfg() { document.getElementById('cfg-ov').classList.remove('open'); }
+
+// ══════════════════════════════════════════════════════════════
+//  UTILITIES
+// ══════════════════════════════════════════════════════════════
+function tagLbl(t) { return {food:'Food',activity:'Activity',logistics:'Logistics'}[t]||t; }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function strCol(s) { let h=0; for(const c of String(s)) h=c.charCodeAt(0)+((h<<5)-h); return `hsl(${Math.abs(h)%360},50%,44%)`; }
+function inits(s) { return String(s).split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2)||'?'; }
+function fmtTs(ts) {
+  if (!ts) return '';
+  const d = Date.now()-ts;
+  if (d<60000) return 'just now';
+  if (d<3600000) return `${Math.floor(d/60000)}m ago`;
+  if (d<86400000) return `${Math.floor(d/3600000)}h ago`;
+  return new Date(ts).toLocaleDateString();
+}
+function toMin(t) {
+  const s=(t||'').toLowerCase();
+  if (s==='morning') return 8*60; if (s==='afternoon') return 13*60;
+  if (s==='evening') return 18*60; if (s==='tbd') return 12*60;
+  const m=s.match(/(\d+):?(\d*)\s*(am|pm)/); if (!m) return 12*60;
+  let h=+m[1],mn=+m[2]||0;
+  if (m[3]==='pm'&&h!==12) h+=12; if (m[3]==='am'&&h===12) h=0;
+  return h*60+mn;
+}
+function toast(msg, ms=3000) {
+  const el = document.createElement('div'); el.className='toast'; el.textContent=msg;
+  document.body.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.remove(),300); }, ms);
+}
+
+// ══════════════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function() {
+  const u = localStorage.getItem('mw_user');
+  if (u) {
+    curUser = u;
+    document.getElementById('user-disp').textContent = u;
+  }
+  else setTimeout(showNamePicker, 800);
+
+  initMap();
+
+  const fbOk = initFB();
+  if (fbOk) { setupFBListeners(); }
+  else if (FIREBASE_CONFIG.apiKey !== 'YOUR_API_KEY') { localMode=true; loadLocal(); }
+
+  ['act-ov','cfg-ov'].forEach(function(id) {
+    document.getElementById(id).addEventListener('click', function(e) { if(e.target===this) this.classList.remove('open'); });
+  });
+  document.getElementById('nm-ov').addEventListener('click', function(e) {
+    if (e.target===this && curUser) this.classList.remove('open');
+  });
+});
+
+// ══════════════════════════════════════════════════════════════
+//  MOBILE VIEW SWITCHING
+// ══════════════════════════════════════════════════════════════
+function setMobileView(view) {
+  if (window.innerWidth > 720) return;
+  const lp = document.getElementById('lp');
+  document.querySelectorAll('.mob-tab[data-v]').forEach(b => b.classList.remove('on'));
+  const btn = document.querySelector(`.mob-tab[data-v="${view}"]`);
+  if (btn) btn.classList.add('on');
+  if (view === 'schedule') {
+    lp.classList.add('mob-schedule-on');
+    document.body.classList.add('mob-schedule');
+  } else {
+    lp.classList.remove('mob-schedule-on');
+    document.body.classList.remove('mob-schedule');
+    setTimeout(() => { try { map.invalidateSize(); } catch(e){} }, 50);
+  }
+}
+</script>
+
+<!-- Mobile: bottom tab bar + FAB -->
+<div id="mob-tabs">
+  <button class="mob-tab on" data-v="map" onclick="setMobileView('map')">
+    <span class="mob-tab-icon">🗺</span>Map
+  </button>
+  <button class="mob-tab" data-v="schedule" onclick="setMobileView('schedule')">
+    <span class="mob-tab-icon">📋</span>Schedule
+  </button>
+</div>
+<button id="mob-fab" onclick="openAdd()">+</button>
+</body>
+</html>
