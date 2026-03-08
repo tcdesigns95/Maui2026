@@ -51,6 +51,7 @@
     .chip { background: rgba(14,165,233,0.12); border: 1px solid rgba(14,165,233,0.35); border-radius: 16px; padding: 4px 11px; font-size: 0.76em; cursor: pointer; color: var(--cyan); transition: all .18s; }
     .chip:hover { background: rgba(14,165,233,0.2); }
     .ibtn { width: 30px; height: 30px; border-radius: 50%; background: rgba(0,0,0,0.04); border: 1px solid var(--bdr); color: var(--muted); font-size: 0.87em; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+    .ibtn-undo { width: 24px; height: 24px; font-size: 0.75em; }
     .ibtn:hover { background: rgba(0,0,0,0.08); color: #1a1a1a; }
     .ibtn.has-badge { position: relative; }
     .ibtn .badge-dot { position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; border-radius: 50%; background: var(--sugg); }
@@ -123,6 +124,8 @@
       cursor: pointer; transition: background .15s;
     }
     .lp-day-add-row:hover { background: rgba(0,0,0,0.03); color: #1a1a1a; }
+    .lp-reset-btn { background: rgba(255,255,255,0.25); border: none; color: white; font-size: 0.68em; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-weight: 600; }
+    .lp-reset-btn:hover { background: rgba(255,255,255,0.4); }
 
     /* ── ACTIVITY LIST (flat, no rounded cards) ── */
     .li {
@@ -814,6 +817,7 @@
       <div class="sub">March 10–15 · Master Schedule · 6 Days in Paradise</div>
     </div>
     <div class="hdr-r">
+      <button class="ibtn ibtn-undo" id="undo-btn" onclick="undoLastDelete()" title="Undo last delete" style="display:none">↶</button>
       <button class="ibtn" id="notes-btn" onclick="toggleNotesPanel()" title="Group chat">💬</button>
       <div class="chip" onclick="showNamePicker()">👤 <span id="user-disp">…</span></div>
       <button class="ibtn" onclick="showCfg()">⚙️</button>
@@ -961,6 +965,7 @@ let acts = {}, mkrs = {};
 let foodGuide = { breakfast:[], lunch:[], sweets:[], bookAsap:[] };
 let roadToHana = [];
 let listUpdates = [];
+let lastDeleted = null;
 let curId = null, visIds = [], editId = null;
 let pickMode = false, pickTarget = null;
 let travelers = ['Traveler 1','Traveler 2','Traveler 3','Traveler 4','Traveler 5'];
@@ -1214,6 +1219,7 @@ function renderAll() {
   syncMap();
   renderLP();
   updateNotesUnreadGlow();
+  updateUndoBtn();
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1374,7 +1380,10 @@ function editFoodItem(key, idx) {
 function renderRoadToHana(body) {
   let html = `<div class="ag-section ag-hana">
     <div class="lp-day-group">
-      <div class="lp-day-hd" style="background:#22c55e;color:white">🛤 Road to Hana - Stop Order</div>
+      <div class="lp-day-hd" style="background:#22c55e;color:white">
+        <span>🛤 Road to Hana - Stop Order</span>
+        <button class="lp-reset-btn" onclick="resetHanaToDefaults()" title="Reset to defaults">Reset</button>
+      </div>
       <div class="lp-day-body"><ol class="ag-hana-list">`;
   roadToHana.forEach((stop, i) => {
     const checkCls = stop.confirmed ? '' : ' empty';
@@ -1411,8 +1420,12 @@ function addHanaStop() {
 
 function removeHanaStop(idx) {
   if (idx < 0 || idx >= roadToHana.length) return;
+  if (!confirm('Are you sure you want to delete this stop?')) return;
+  const stop = roadToHana[idx];
+  lastDeleted = { type:'hana', item: {...stop}, index: idx };
   roadToHana.splice(idx, 1);
   saveLocal();
+  updateUndoBtn();
   renderLP();
 }
 
@@ -1432,6 +1445,43 @@ function toggleHanaConfirmed(idx) {
   if (!roadToHana[idx]) return;
   roadToHana[idx].confirmed = !roadToHana[idx].confirmed;
   saveLocal();
+  renderLP();
+}
+
+function resetHanaToDefaults() {
+  if (!confirm('Reset Road to Hana to original defaults? This will replace your current list.')) return;
+  roadToHana = HANA_DEFAULTS.map((h,i)=>({...h, confirmed:i===7}));
+  saveLocal();
+  renderLP();
+  toast('🛤 Road to Hana reset to defaults.');
+}
+
+function updateUndoBtn() {
+  const btn = document.getElementById('undo-btn');
+  if (btn) btn.style.display = lastDeleted ? 'flex' : 'none';
+}
+
+function undoLastDelete() {
+  if (!lastDeleted) return;
+  if (lastDeleted.type === 'hana') {
+    roadToHana.splice(lastDeleted.index, 0, lastDeleted.item);
+    saveLocal();
+    toast('↶ Undid delete.');
+  } else if (lastDeleted.type === 'food') {
+    foodGuide[lastDeleted.key] = foodGuide[lastDeleted.key] || [];
+    foodGuide[lastDeleted.key].splice(lastDeleted.index, 0, lastDeleted.item);
+    saveLocal();
+    toast('↶ Undid delete.');
+  } else if (lastDeleted.type === 'activity') {
+    const { id, item } = lastDeleted;
+    acts[id] = item;
+    if (db) db.ref(`activities/${id}`).set(item);
+    else saveLocal();
+    renderAll();
+    toast('↶ Undid delete.');
+  }
+  lastDeleted = null;
+  updateUndoBtn();
   renderLP();
 }
 
@@ -1800,13 +1850,16 @@ function openAddForDay(day) {
   document.getElementById('act-ov').classList.add('open');
 }
 function deleteActDirect(id) {
-  if (!confirm('Delete this activity?')) return;
+  if (!confirm('Are you sure you want to delete this activity?')) return;
+  const a = acts[id];
+  if (a) lastDeleted = { type:'activity', item: {...a}, id };
   if (db) { db.ref(`activities/${id}`).remove(); }
   else {
     if (mkrs[id]) { try { map.removeLayer(mkrs[id]); } catch(e){} delete mkrs[id]; }
     delete acts[id]; saveLocal(); renderAll();
   }
   if (curId === id) closeDP();
+  updateUndoBtn();
   toast('🗑 Deleted.');
 }
 function openEdit(id) {
@@ -1985,6 +2038,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (e.target===this && curUser) this.classList.remove('open');
   });
   setupSwipeRows();
+  updateUndoBtn();
   if (window.innerWidth <= 720) setMobileView('schedule');
 });
 
@@ -2117,4 +2171,3 @@ function setMobileView(view) {
 <button id="mob-fab" onclick="openAdd()">+</button>
 </body>
 </html>
-
