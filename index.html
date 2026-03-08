@@ -54,7 +54,7 @@
     .ibtn:hover { background: rgba(0,0,0,0.08); color: #1a1a1a; }
     .ibtn.has-badge { position: relative; }
     .ibtn .badge-dot { position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; border-radius: 50%; background: var(--sugg); }
-    .notes-unread-count { position: absolute; top: -2px; right: -2px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background: #eab308; color: #1a1a1a; font-size: 0.6em; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+    .notes-unread-count { position: absolute; top: -6px; right: -10px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: #eab308; color: #1a1a1a; font-size: 0.62em; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.2); z-index: 1; }
     #notes-btn.has-unread { color: #eab308; box-shadow: 0 0 12px rgba(234,179,8,0.6), 0 0 24px rgba(234,179,8,0.35); border-color: rgba(234,179,8,0.6); animation: notes-glow 2s ease-in-out infinite; }
     @keyframes notes-glow { 50% { box-shadow: 0 0 16px rgba(234,179,8,0.7), 0 0 32px rgba(234,179,8,0.4); } }
 
@@ -194,13 +194,22 @@
     .ag-item-txt { flex: 1; line-height: 1.4; }
     .ag-remove { width: 22px; height: 22px; border-radius: 50%; background: rgba(239,68,68,0.15); border: none; color: #dc2626; font-size: 1em; cursor: pointer; flex-shrink: 0; line-height: 1; display: flex; align-items: center; justify-content: center; }
     .ag-remove:hover { background: rgba(239,68,68,0.25); }
-    .ag-hana-list { list-style: none; padding: 0; margin: 0; counter-reset: hana; }
-    .ag-hana-item { position: relative; padding: 10px 36px 10px 12px; border-bottom: 1px solid rgba(0,0,0,0.08); background: white; transition: background .15s; }
+    .ag-hana-list { list-style: none; padding: 0; margin: 0; }
+    .ag-hana-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 10px 12px; padding-right: 40px;
+      border-bottom: 1px solid rgba(0,0,0,0.08); background: white;
+    }
     .ag-hana-item:last-child { border-bottom: none; }
-    .ag-hana-item:hover { background: rgba(0,0,0,0.02); }
-    .ag-hana-title { font-size: 0.85em; font-weight: 700; color: #1a1a1a; margin-bottom: 2px; cursor: pointer; }
+    .ag-hana-check {
+      flex-shrink: 0; width: 22px; height: 22px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9em; color: #22c55e; cursor: pointer;
+    }
+    .ag-hana-check.empty { color: rgba(0,0,0,0.2); font-size: 0.75em; }
+    .ag-hana-main { flex: 1; min-width: 0; }
+    .ag-hana-title { font-size: 0.85em; font-weight: 700; color: #1a1a1a; margin-bottom: 2px; cursor: pointer; line-height: 1.3; }
     .ag-hana-desc { font-size: 0.78em; color: #555; line-height: 1.4; }
-    .ag-check { color: #22c55e; font-weight: 700; }
     .ag-remove-hana { position: absolute; top: 50%; right: 12px; transform: translateY(-50%); }
 
     /* ── MAP WRAPPER ── */
@@ -343,6 +352,13 @@
       /* Hide note & actions on mobile cards — tap opens detail */
       .li-note, .li-note-editor, .li-actions { display: none !important; }
       .li-tag, .sugg-badge { font-size: 0.65em; padding: 2px 6px; }
+
+      /* Road to Hana: simple, readable on mobile */
+      .ag-hana-item { padding: 12px 16px 12px 16px; padding-right: 44px; }
+      .ag-hana-check { width: 24px; height: 24px; font-size: 1em; }
+      .ag-hana-title { font-size: 0.9em; line-height: 1.35; }
+      .ag-hana-desc { font-size: 0.8em; margin-top: 4px; }
+      .ag-remove-hana { right: 16px; }
 
       /* Detail panel */
       #dp {
@@ -689,6 +705,7 @@
       .ag-add { border-color: rgba(129,178,154,0.5); color: var(--teal); }
       .ag-add:hover { background: rgba(129,178,154,0.1); }
       .ag-hana-item { border-bottom-color: var(--bdr); }
+      .ag-hana-check.empty { color: rgba(255,255,255,0.25); }
       .ag-hana-title { color: #e5e0d8; }
       .ag-hana-desc { color: var(--muted); }
     }
@@ -1316,9 +1333,14 @@ function renderRoadToHana(body) {
       <div class="lp-day-hd" style="background:#22c55e;color:white">🛤 Road to Hana - Stop Order</div>
       <div class="lp-day-body"><ol class="ag-hana-list">`;
   roadToHana.forEach((stop, i) => {
+    const checkCls = stop.confirmed ? '' : ' empty';
+    const checkChar = stop.confirmed ? '✓' : '○';
     html += `<li class="ag-hana-item">
-      <div class="ag-hana-title" onclick="toggleHanaConfirmed(${i})" title="Click to toggle confirmed">${i+1}. ${esc(stop.name)}${stop.confirmed ? ' <span class="ag-check">✓</span>' : ''}</div>
-      ${stop.desc ? `<div class="ag-hana-desc">${esc(stop.desc)}</div>` : ''}
+      <span class="ag-hana-check${checkCls}" onclick="toggleHanaConfirmed(${i})" title="Tap to toggle">${checkChar}</span>
+      <div class="ag-hana-main">
+        <div class="ag-hana-title" onclick="toggleHanaConfirmed(${i})">${i+1}. ${esc(stop.name)}</div>
+        ${stop.desc ? `<div class="ag-hana-desc">${esc(stop.desc)}</div>` : ''}
+      </div>
       <button class="ag-remove ag-remove-hana" onclick="event.stopPropagation();removeHanaStop(${i})" title="Remove">×</button>
     </li>`;
   });
