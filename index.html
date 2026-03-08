@@ -256,9 +256,9 @@
       box-shadow: 0 -4px 24px rgba(0,0,0,0.08);
     }
     .mob-tab {
-      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
       gap: 2px; border: none; background: none; color: rgba(0,0,0,0.45);
-      font-size: 0.7em; font-weight: 700; cursor: pointer;
+      font-size: 0.68em; font-weight: 700; cursor: pointer;
       -webkit-tap-highlight-color: transparent; transition: color .2s;
     }
     .mob-tab.on { color: var(--teal); }
@@ -1831,9 +1831,24 @@ function setMobileView(view) {
   document.querySelectorAll('.mob-tab[data-v]').forEach(b => b.classList.remove('on'));
   const btn = document.querySelector(`.mob-tab[data-v="${view}"]`);
   if (btn) btn.classList.add('on');
-  if (view === 'schedule') {
+  const showList = view === 'schedule' || view === 'food' || view === 'hana';
+  if (showList) {
     lp.classList.add('mob-schedule-on');
     document.body.classList.add('mob-schedule');
+    const day = view === 'schedule' ? (['food','hana'].includes(curDay) ? 'all' : curDay) : view;
+    if (day !== curDay) {
+      curDay = day;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+      const tabBtn = document.querySelector(`.tab[data-d="${day}"]`);
+      if (tabBtn) tabBtn.classList.add('on');
+      Object.keys(acts).forEach(id => applyFilter(id));
+      drawHanaRoute();
+      const titles = { all:'📋 Full Schedule', food:'🍴 Food Guide', hana:'🛤 Road to Hana' };
+      document.getElementById('lp-title').textContent = titles[day] || `📋 ${DL[day] || day}`;
+      const addBtn = document.querySelector('.lp-add');
+      if (addBtn) addBtn.style.display = (day === 'food' || day === 'hana') ? 'none' : '';
+    }
+    renderLP();
   } else {
     lp.classList.remove('mob-schedule-on');
     document.body.classList.remove('mob-schedule');
@@ -1849,6 +1864,12 @@ function setMobileView(view) {
   </button>
   <button class="mob-tab" data-v="schedule" onclick="setMobileView('schedule')">
     <span class="mob-tab-icon">📋</span>Schedule
+  </button>
+  <button class="mob-tab" data-v="food" onclick="setMobileView('food')">
+    <span class="mob-tab-icon">🍴</span>Food
+  </button>
+  <button class="mob-tab" data-v="hana" onclick="setMobileView('hana')">
+    <span class="mob-tab-icon">🛤</span>Hana
   </button>
 </div>
 <button id="mob-fab" onclick="openAdd()">+</button>
