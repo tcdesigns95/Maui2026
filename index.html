@@ -14,7 +14,6 @@
 
     :root {
       --gb:    rgba(255, 255, 255, 0.95);
-      --gb2:   rgba(255, 250, 245, 0.98);
       --bdr:   rgba(0, 0, 0, 0.08);
       --blur:  blur(20px) saturate(1.2);
       --cyan:  #0ea5e9;
@@ -76,6 +75,9 @@
     [data-d=fri].on { background:rgba(249,115,22,0.2); border-color:rgba(249,115,22,0.5); color:var(--d-fri); box-shadow:0 2px 12px rgba(249,115,22,0.3); }
     [data-d=sat].on { background:rgba(6,182,212,0.2); border-color:rgba(6,182,212,0.5); color:var(--d-sat); box-shadow:0 2px 12px rgba(6,182,212,0.3); }
     [data-d=sun].on { background:rgba(234,179,8,0.2); border-color:rgba(234,179,8,0.5); color:var(--d-sun); box-shadow:0 2px 12px rgba(234,179,8,0.3); }
+    .tab-divider { width:1px; height:20px; background:rgba(0,0,0,0.12); margin:0 4px; align-self:center; flex-shrink:0; }
+    .tab-label { font-size:0.65em; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; padding:0 6px; align-self:center; }
+    [data-d=food].on,[data-d=hana].on { background:rgba(20,184,166,0.2); border-color:rgba(20,184,166,0.5); color:var(--teal); box-shadow:0 2px 12px rgba(20,184,166,0.3); }
 
     /* ── MAIN AREA (list + map) ── */
     #mw { flex: 1; display: flex; overflow: hidden; position: relative; }
@@ -106,32 +108,31 @@
     .lp-add:hover { background: linear-gradient(135deg,#16a34a,#0d9488); box-shadow: 0 4px 12px rgba(34,197,94,0.4); }
     .lp-close { width: 26px; height: 26px; border-radius: 50%; background: rgba(0,0,0,0.05); border: 1px solid var(--bdr); color: var(--muted); cursor: pointer; font-size: 0.82em; display: none; align-items: center; justify-content: center; }
 
-    .lp-body { flex: 1; overflow-y: auto; padding: 8px; }
+    .lp-body { flex: 1; overflow-y: auto; padding: 12px; }
+    .lp-day-group { margin-bottom: 16px; background: white; overflow: hidden; }
     .lp-day-hd {
-      padding: 6px 6px 4px; font-size: 0.68em; font-weight: 700;
-      position: sticky; top: 0; z-index: 10;
-      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-      display: flex; align-items: center; gap: 6px; margin-bottom: 4px;
+      padding: 10px 12px; font-size: 0.78em; font-weight: 700;
+      display: flex; align-items: center; justify-content: space-between;
     }
-    .lp-day-add {
-      width: 18px; height: 18px; border-radius: 50%; background: rgba(0,0,0,0.06);
-      border: 1px solid rgba(0,0,0,0.12); color: var(--muted);
-      cursor: pointer; font-size: 0.88em; display: flex; align-items: center;
-      justify-content: center; transition: all .12s; margin-left: auto;
+    .lp-day-add-row {
+      padding: 10px 12px; font-size: 0.78em; color: var(--muted);
+      border: 1px dashed rgba(0,0,0,0.2); border-top: none;
+      cursor: pointer; transition: background .15s;
     }
-    .lp-day-add:hover { background: rgba(0,0,0,0.1); color: #1a1a1a; }
+    .lp-day-add-row:hover { background: rgba(0,0,0,0.03); color: #1a1a1a; }
 
-    /* ── ACTIVITY CARD (legend-box style) ── */
+    /* ── ACTIVITY LIST (flat, no rounded cards) ── */
     .li {
       background: white;
-      border: 1px solid rgba(0,0,0,0.06);
-      border-radius: 16px; margin-bottom: 8px; overflow: hidden;
-      transition: all .2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      border: none; border-bottom: 1px solid rgba(0,0,0,0.08);
+      border-radius: 0; margin: 0; overflow: hidden;
+      transition: background .15s;
     }
-    .li:hover { background: #fefefe; border-color: rgba(0,0,0,0.1); box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateY(-1px); }
-    .li.active { border-color: var(--teal); background: linear-gradient(135deg,rgba(20,184,166,0.1),rgba(20,184,166,0.05)); box-shadow: 0 4px 20px rgba(20,184,166,0.2); }
+    .li:last-child { border-bottom: none; }
+    .li:hover { background: rgba(0,0,0,0.02); }
+    .li.active { background: rgba(20,184,166,0.08); box-shadow: inset 3px 0 0 var(--teal); }
 
-    .li-top { display: flex; align-items: center; gap: 8px; padding: 9px 10px 6px; cursor: pointer; }
+    .li-top { display: flex; align-items: center; gap: 8px; padding: 10px 12px 8px; cursor: pointer; }
     .li-num {
       width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
@@ -147,7 +148,7 @@
 
     /* Inline note — always visible */
     .li-note {
-      padding: 0 10px 7px 40px;
+      padding: 0 12px 10px 40px;
       font-size: 0.72em; color: var(--muted); line-height: 1.45;
       border-left: 2px solid transparent; margin: 0 0 0 0;
     }
@@ -168,13 +169,40 @@
     .li-cancel { padding: 4px 10px; border-radius: 6px; background: rgba(212,196,168,0.06); border: 1px solid var(--bdr); color: var(--muted); font-size: 0.72em; cursor: pointer; }
 
     /* Card action row */
-    .li-actions { display: flex; gap: 5px; padding: 0 10px 8px; }
+    .li-actions { display: flex; gap: 5px; padding: 0 12px 10px; }
     .li-act-btn { flex: 1; padding: 5px; border-radius: 7px; font-size: 0.68em; font-weight: 600; cursor: pointer; border: 1px solid var(--bdr); background: rgba(255,255,255,0.05); color: var(--muted); transition: all .12s; }
     .li-act-btn:hover { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.85); }
     .li-act-btn.del { background: rgba(255,107,53,0.08); color: var(--sugg); border-color: rgba(255,107,53,0.22); }
     .li-act-btn.del:hover { background: rgba(255,107,53,0.2); }
 
     .sugg-badge { font-size: 0.58em; background: rgba(224,122,95,0.2); color: var(--coral); border: 1px solid rgba(224,122,95,0.4); border-radius: 6px; padding: 1px 5px; font-weight: 700; }
+
+    /* ── ACTIVITY GUIDE ── */
+    .ag-section { padding: 4px 0; }
+    .ag-h { font-size: 0.9em; font-weight: 700; color: var(--teal); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+    .ag-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .ag-panel { background: white; border-radius: 12px; padding: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow: hidden; }
+    .ag-panel-h { font-size: 0.78em; font-weight: 700; color: #1a1a1a; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+    .ag-list { list-style: none; padding: 0; margin: 0; }
+    .ag-item { display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px dashed rgba(0,0,0,0.1); font-size: 0.8em; color: #333; }
+    .ag-item:last-of-type { border-bottom: none; }
+    .ag-bullet { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); flex-shrink: 0; margin-top: 6px; }
+    .ag-item-txt { flex: 1; line-height: 1.4; }
+    .ag-remove { width: 22px; height: 22px; border-radius: 50%; background: rgba(239,68,68,0.15); border: none; color: #dc2626; font-size: 1em; cursor: pointer; flex-shrink: 0; line-height: 1; display: flex; align-items: center; justify-content: center; }
+    .ag-remove:hover { background: rgba(239,68,68,0.25); }
+    .ag-add { margin-top: 10px; padding: 10px; border: 1px dashed rgba(20,184,166,0.5); border-radius: 8px; font-size: 0.78em; color: var(--teal); cursor: pointer; text-align: center; font-weight: 600; transition: background .15s; }
+    .ag-add:hover { background: rgba(20,184,166,0.06); }
+    .ag-hana-list { list-style: none; padding: 0; margin: 0; counter-reset: hana; }
+    .ag-hana-item { position: relative; padding: 14px 36px 14px 0; border-bottom: 1px solid rgba(0,0,0,0.08); }
+    .ag-hana-item:last-of-type { border-bottom: none; }
+    .ag-hana-title { font-size: 0.9em; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
+    .ag-hana-desc { font-size: 0.78em; color: #555; line-height: 1.4; }
+    .ag-check { color: #22c55e; font-weight: 700; }
+    .ag-hana-title { cursor: pointer; }
+    .ag-remove-hana { position: absolute; top: 50%; right: 0; transform: translateY(-50%); }
+    .ag-add-hana { margin-top: 16px; }
+
+    @media (max-width: 480px) { .ag-grid { grid-template-columns: 1fr; } }
 
     /* ── MAP WRAPPER ── */
     #mw-r { flex: 1; position: relative; overflow: hidden; }
@@ -204,9 +232,6 @@
     .lg-d { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
     .lg-pulse { animation: mwp 2s infinite; }
     @keyframes mwp { 0%,100% { box-shadow:0 0 0 0 rgba(224,122,95,0.5); } 50% { box-shadow:0 0 0 5px rgba(224,122,95,0); } }
-
-    /* Old floating list toggle — hidden on mobile, replaced by bottom nav */
-    #list-toggle-btn { display: none; }
 
     /* FAB — desktop only */
     #fab {
@@ -252,13 +277,9 @@
     }
     #mob-fab:active { transform: scale(0.92); }
 
-    .lp-handle { display: none; }
-
     @media (max-width: 720px) {
       #app { padding-bottom: calc(56px + env(safe-area-inset-bottom)); }
-      #bnav { display: none !important; }
       #fab { display: none !important; }
-      #list-toggle-btn { display: none !important; }
       #mob-tabs { display: flex; }
       #mob-fab { display: flex; }
       body.mob-schedule #mob-fab { display: none !important; }
@@ -291,7 +312,6 @@
         z-index: 350;
       }
       #lp.mob-schedule-on { display: flex !important; }
-      .lp-handle { display: none !important; }
       .lp-close { display: none !important; }
       .lp-hd {
         padding: 12px 16px; border-bottom: 1px solid rgba(0,0,0,0.06);
@@ -304,19 +324,20 @@
         margin-left: auto; box-shadow: 0 4px 12px rgba(34,197,94,0.35);
       }
 
-      /* Schedule cards: clean, tap-friendly */
+      /* Schedule: flat list, day groups */
       .lp-body { padding: 12px 16px 24px; }
-      .lp-day-hd { font-size: 0.75em; padding: 10px 0 6px; margin-top: 4px; color: var(--muted); }
-      .lp-day-hd:first-of-type { margin-top: 0; }
-      .lp-day-add { display: none; }
+      .lp-day-group { margin-bottom: 20px; }
+      .lp-day-hd { font-size: 0.8em; padding: 12px 16px; }
+      .lp-day-add-row { padding: 12px 16px; font-size: 0.82em; }
       .li {
         background: white;
-        border: 1px solid rgba(0,0,0,0.06);
-        border-radius: 16px; margin-bottom: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        border: none; border-bottom: 1px solid rgba(0,0,0,0.08);
+        border-radius: 0; margin: 0;
       }
-      .li:active { background: #fafafa; }
-      .li.active { border-color: var(--teal); background: linear-gradient(135deg,rgba(20,184,166,0.1),rgba(20,184,166,0.05)); box-shadow: 0 4px 16px rgba(20,184,166,0.2); }
-      .li-top { padding: 14px 14px 10px; }
+      .li:last-child { border-bottom: none; }
+      .li:active { background: rgba(0,0,0,0.03); }
+      .li.active { background: rgba(20,184,166,0.08); box-shadow: inset 3px 0 0 var(--teal); }
+      .li-top { padding: 14px 16px 10px; }
       .li-num { width: 28px; height: 28px; font-size: 0.7em; }
       .li-name { font-size: 0.95em; white-space: normal; line-height: 1.3; color: #1a1a1a; }
       .li-time { font-size: 0.75em; color: var(--muted); margin-bottom: 2px; }
@@ -544,18 +565,22 @@
       .tab:hover { border-color: rgba(255,255,255,0.15); color: #e5e0d8; }
       [data-d=all].on { background: rgba(14,165,233,0.25); border-color: rgba(14,165,233,0.5); }
       [data-d=tue].on,[data-d=wed].on,[data-d=thu].on,[data-d=fri].on,[data-d=sat].on,[data-d=sun].on { box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+      .tab-divider { background: var(--bdr); }
+      .tab-label { color: var(--muted); }
+      [data-d=food].on,[data-d=hana].on { background: rgba(129,178,154,0.25); border-color: rgba(129,178,154,0.5); color: var(--teal); }
 
       #lp { background: rgba(30,45,58,0.96); border-right-color: var(--bdr); }
       @media (max-width: 720px) { #lp.open { box-shadow: 4px 0 24px rgba(0,0,0,0.6); } }
       .lp-hd { border-bottom-color: var(--bdr); }
       .lp-title { color: #e5e0d8; }
       .lp-close { background: rgba(255,255,255,0.08); border-color: var(--bdr); color: var(--muted); }
-      .lp-day-add { background: rgba(255,255,255,0.06); border-color: var(--bdr); color: var(--muted); }
-      .lp-day-add:hover { background: rgba(255,255,255,0.12); color: #e5e0d8; }
+      .lp-day-group { background: rgba(255,255,255,0.03); }
+      .lp-day-add-row { border-color: var(--bdr); color: var(--muted); }
+      .lp-day-add-row:hover { background: rgba(255,255,255,0.06); color: #e5e0d8; }
 
-      .li { background: rgba(255,255,255,0.05); border-color: var(--bdr); box-shadow: 0 2px 12px rgba(0,0,0,0.2); }
-      .li:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.12); }
-      .li.active { background: rgba(129,178,154,0.15); border-color: var(--teal); }
+      .li { background: transparent; border-bottom-color: var(--bdr); }
+      .li:hover { background: rgba(255,255,255,0.04); }
+      .li.active { background: rgba(129,178,154,0.15); box-shadow: inset 3px 0 0 var(--teal); }
       .li-name { color: rgba(245,240,232,0.95); }
       .li-note.has-note { color: rgba(212,196,168,0.7); background: rgba(129,178,154,0.06); }
       .li-note-ta { background: rgba(212,196,168,0.06); border-color: rgba(129,178,154,0.4); color: var(--sand); }
@@ -577,7 +602,7 @@
       @media (max-width: 720px) {
         #lp { background: linear-gradient(180deg, #1a2530 0%, #0f172a 100%); }
         .lp-hd { border-bottom-color: var(--bdr); }
-        .li { background: rgba(255,255,255,0.05); border-color: var(--bdr); }
+        .li { background: transparent; border-bottom-color: var(--bdr); }
         .li.active { background: rgba(129,178,154,0.12); }
       }
 
@@ -648,6 +673,16 @@
       .leaflet-control-zoom a:hover { background: rgba(38,55,70,0.98)!important; color: var(--sand)!important; }
       .leaflet-control-attribution { background: rgba(30,45,58,0.8)!important; color: var(--muted)!important; }
       .leaflet-control-attribution a { color: rgba(212,196,168,0.5)!important; }
+
+      .ag-h { color: var(--teal); }
+      .ag-panel { background: rgba(255,255,255,0.05); box-shadow: none; border: 1px solid var(--bdr); }
+      .ag-panel-h { color: #e5e0d8; }
+      .ag-item { color: rgba(245,240,232,0.9); border-bottom-color: var(--bdr); }
+      .ag-add { border-color: rgba(129,178,154,0.5); color: var(--teal); }
+      .ag-add:hover { background: rgba(129,178,154,0.1); }
+      .ag-hana-item { border-bottom-color: var(--bdr); }
+      .ag-hana-title { color: #e5e0d8; }
+      .ag-hana-desc { color: var(--muted); }
     }
   </style>
 </head>
@@ -713,7 +748,7 @@
 <div class="ov" id="cfg-ov">
   <div class="modal">
     <div class="modal-t">⚙️ Trip Settings</div>
-    <p style="font-size:0.79em;color:var(--muted);margin-bottom:12px">All listed travelers must approve a suggestion before it becomes an official itinerary item.</p>
+    <p style="font-size:0.79em;color:var(--muted);margin-bottom:12px">A majority of travelers signed on must approve a suggestion before it becomes an official itinerary item.</p>
     <div id="trv-list"></div>
     <button class="btn-p" onclick="saveCfg()">Save Settings</button>
     <button class="btn-s" onclick="closeCfg()">Cancel</button>
@@ -742,12 +777,15 @@
     <button class="tab" data-d="fri" onclick="setDay('fri',this)">🐋 Fri 3/13</button>
     <button class="tab" data-d="sat" onclick="setDay('sat',this)">⛵ Sat 3/14</button>
     <button class="tab" data-d="sun" onclick="setDay('sun',this)">🏠 Sun 3/15</button>
+    <span class="tab-divider"></span>
+    <span class="tab-label">Activity Guide</span>
+    <button class="tab" data-d="food" onclick="setDay('food',this)">🍴 Food Guide</button>
+    <button class="tab" data-d="hana" onclick="setDay('hana',this)">🛤 Road to Hana</button>
   </div>
 
   <div id="mw">
     <!-- LEFT: Always-visible list panel -->
     <div id="lp">
-      <div class="lp-handle"></div>
       <div class="lp-hd">
         <span class="lp-title" id="lp-title">📋 Schedule</span>
         <button class="lp-add" onclick="openAdd()">+ Add</button>
@@ -765,9 +803,7 @@
         <div class="lg-r"><div class="lg-d lg-pulse" style="background:var(--sugg)"></div>Suggestion</div>
         <div class="lg-r"><div class="lg-d" style="background:var(--d-wed);opacity:0.7"></div><span style="color:var(--muted)">- -</span> Hana Route</div>
       </div>
-      <button id="list-toggle-btn" onclick="toggleLP()">📋 Schedule</button>
       <button id="fab" onclick="openAdd()">+ Suggest Activity</button>
-
     </div>
   </div>
 </div>
@@ -850,7 +886,7 @@ const SEED = [
 // ══════════════════════════════════════════════════════════════
 //  CONSTANTS
 // ══════════════════════════════════════════════════════════════
-const DC = { tue:'#7eb8da', wed:'#81b29a', thu:'#b8a9c9', fri:'#e07a5f', sat:'#73d8c0', sun:'#e8c547', unscheduled:'#9e9e9e' };
+const DC = { tue:'#0ea5e9', wed:'#22c55e', thu:'#a855f7', fri:'#f97316', sat:'#06b6d4', sun:'#eab308', unscheduled:'#64748b' };
 const DL = {
   tue:'✈️ Tue 3/10 · Arrival',         wed:'🌿 Wed 3/11 · Road to Hana',
   thu:'🌋 Thu 3/12 · Haleakalā Sunset', fri:'🐋 Fri 3/13 · Whale Watch + Paia',
@@ -870,6 +906,8 @@ const HANA_IDS = ['b1','b2','b3','b4','b5','b6','b7','b8','b9'];
 let db = null, localMode = false;
 let curUser = null, curDay = 'all';
 let acts = {}, mkrs = {};
+let foodGuide = { breakfast:[], lunch:[], sweets:[], bookAsap:[] };
+let roadToHana = [];
 let curId = null, visIds = [], editId = null;
 let pickMode = false, pickTarget = null;
 let travelers = ['Traveler 1','Traveler 2','Traveler 3','Traveler 4','Traveler 5'];
@@ -894,10 +932,24 @@ function dismissSetup() {
   localMode = true; loadLocal();
 }
 
+const HANA_DEFAULTS = [
+  { name:'Twin Falls', desc:'Mile 2. $10 parking. Waterfall hike. ~45 min' },
+  { name:'Garden of Eden Arboretum', desc:'Mile 10. $20. Botanical garden. ~1 hr' },
+  { name:'Keʻanae Peninsula', desc:'Mile 16. Lava coastline. ~30 min' },
+  { name:'Waiʻānapanapa State Park', desc:'Black sand beach. Reservations required.' },
+  { name:'Hana Town', desc:'Lunch stop. Food trucks & shops.' },
+  { name:'Wailua Falls', desc:'Mile 45. Famous waterfall. ~20 min' }
+];
+
 function loadLocal() {
   const sv = localStorage.getItem('mw_acts2');
   const st = localStorage.getItem('mw_travelers');
+  const fg = localStorage.getItem('mw_foodGuide');
+  const rth = localStorage.getItem('mw_roadToHana');
   if (st) { try { travelers = JSON.parse(st); } catch(e){} }
+  if (fg) { try { foodGuide = JSON.parse(fg); } catch(e){} }
+  if (rth) { try { roadToHana = JSON.parse(rth); } catch(e){} }
+  if (!roadToHana.length) roadToHana = HANA_DEFAULTS.map((h,i)=>({...h, confirmed:i===3}));
   if (sv) { try { acts = JSON.parse(sv); } catch(e) { acts = {}; } }
   if (!Object.keys(acts).length) {
     SEED.forEach(s => { acts[s.id] = {...s, status:'approved', approvals:{}, notes:{}}; });
@@ -909,6 +961,8 @@ function loadLocal() {
 function saveLocal() {
   localStorage.setItem('mw_acts2', JSON.stringify(acts));
   localStorage.setItem('mw_travelers', JSON.stringify(travelers));
+  localStorage.setItem('mw_foodGuide', JSON.stringify(foodGuide));
+  localStorage.setItem('mw_roadToHana', JSON.stringify(roadToHana));
 }
 
 function setupFBListeners() {
@@ -1005,7 +1059,7 @@ function applyFilter(id) {
   const a = acts[id], m = mkrs[id];
   if (!a || !m) return;
   const isAirbnb = a.id === 'a4' || (a.name && a.name.toLowerCase().includes('airbnb'));
-  const show = curDay === 'all' || a.day === curDay || isAirbnb;
+  const show = curDay === 'all' || curDay === 'food' || curDay === 'hana' || a.day === curDay || isAirbnb;
   try {
     if (show && !map.hasLayer(m)) map.addLayer(m);
     if (!show && map.hasLayer(m)) map.removeLayer(m);
@@ -1014,7 +1068,7 @@ function applyFilter(id) {
 
 function drawHanaRoute() {
   if (hanaLine) { try { map.removeLayer(hanaLine); } catch(e){} hanaLine = null; }
-  if (curDay !== 'all' && curDay !== 'wed') return;
+  if (curDay !== 'all' && curDay !== 'wed' && curDay !== 'hana') return;
   const pts = HANA_IDS.map(id => acts[id]).filter(a => a && a.lat && a.lng).map(a => [a.lat, a.lng]);
   if (pts.length < 2) return;
   try {
@@ -1067,19 +1121,21 @@ function renderAll() {
 function setDay(day, btn) {
   curDay = day;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
-  btn.classList.add('on');
+  if (btn) btn.classList.add('on');
   Object.keys(acts).forEach(id => applyFilter(id));
   drawHanaRoute();
   renderLP();
-  if (curId && acts[curId] && day !== 'all' && acts[curId].day !== day) closeDP();
-  if (day !== 'all') {
+  if (curId && acts[curId] && day !== 'all' && day !== 'food' && day !== 'hana' && acts[curId].day !== day) closeDP();
+  if (day === 'all' || day === 'food' || day === 'hana') {
+    try { map.setView([20.79,-156.34], 11); } catch(e){}
+  } else {
     const pts = Object.values(acts).filter(a => a.day === day && a.lat && a.lng).map(a => [a.lat, a.lng]);
     if (pts.length > 0) { try { map.fitBounds(L.latLngBounds(pts).pad(0.25)); } catch(e){} }
-  } else {
-    try { map.setView([20.79,-156.34], 11); } catch(e){}
   }
-  // Update list panel title
-  document.getElementById('lp-title').textContent = day === 'all' ? '📋 Full Schedule' : `📋 ${DL[day] || day}`;
+  const titles = { all:'📋 Full Schedule', food:'🍴 Food Guide', hana:'🛤 Road to Hana' };
+  document.getElementById('lp-title').textContent = titles[day] || `📋 ${DL[day] || day}`;
+  const addBtn = document.querySelector('.lp-add');
+  if (addBtn) addBtn.style.display = (day === 'food' || day === 'hana') ? 'none' : '';
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1095,6 +1151,8 @@ function toggleLP() {
 
 function renderLP() {
   const body = document.getElementById('lp-body');
+  if (curDay === 'food') { renderFoodGuide(body); return; }
+  if (curDay === 'hana') { renderRoadToHana(body); return; }
   const days = ['tue','wed','thu','fri','sat','sun','unscheduled'];
   const list = Object.values(acts).filter(a => curDay === 'all' || a.day === curDay);
 
@@ -1109,10 +1167,11 @@ function renderLP() {
 
   let html = '';
   days.filter(d => byDay[d]).forEach(d => {
-    html += `<div class="lp-day-hd" style="background:${DC[d]}18;color:${DC[d]}">
-      <span>${DL[d]}</span>
-      <button class="lp-day-add" onclick="event.stopPropagation();openAddForDay('${d}')" title="Add to this day">+</button>
-    </div>`;
+    html += `<div class="lp-day-group">
+      <div class="lp-day-hd" style="background:${DC[d]};color:white">
+        <span>${DL[d]}</span>
+      </div>
+      <div class="lp-day-body">`;
     byDay[d].forEach(a => {
       const sugg = a.status === 'suggestion';
       const col = sugg ? '#e07a5f' : (DC[a.day] || '#7eb8da');
@@ -1143,9 +1202,86 @@ function renderLP() {
           </div>
         </div>`;
     });
+    html += `</div>
+      <div class="lp-day-add-row" onclick="openAddForDay('${d}')">+ Add activity</div>
+    </div>`;
   });
 
   body.innerHTML = html;
+}
+
+function renderFoodGuide(body) {
+  const panels = [
+    { key:'breakfast', title:'Breakfast & Brunch', icon:'☕' },
+    { key:'lunch', title:'Lunch & Dinner', icon:'🐟' },
+    { key:'sweets', title:'Sweets & Snacks', icon:'🍦' },
+    { key:'bookAsap', title:'Book These ASAP', icon:'🚀' }
+  ];
+  let html = '<div class="ag-section"><h3 class="ag-h">🍴 Full Food Guide</h3><div class="ag-grid">';
+  panels.forEach(p => {
+    const items = foodGuide[p.key] || [];
+    html += `<div class="ag-panel">
+      <h4 class="ag-panel-h">${p.icon} ${p.title}</h4>
+      <ul class="ag-list">`;
+    items.forEach((item, i) => {
+      html += `<li class="ag-item"><span class="ag-bullet"></span><span class="ag-item-txt">${esc(item)}</span><button class="ag-remove" onclick="removeFoodItem('${p.key}',${i})" title="Remove">×</button></li>`;
+    });
+    html += `</ul><div class="ag-add" onclick="addFoodItem('${p.key}')">+ Add item</div></div>`;
+  });
+  html += '</div></div>';
+  body.innerHTML = html;
+}
+
+function addFoodItem(key) {
+  const txt = prompt('Add item (e.g. The Gazebo - banana mac nut pancakes)');
+  if (!txt || !txt.trim()) return;
+  foodGuide[key] = foodGuide[key] || [];
+  foodGuide[key].push(txt.trim());
+  saveLocal();
+  renderLP();
+}
+
+function removeFoodItem(key, idx) {
+  if (!foodGuide[key] || idx < 0 || idx >= foodGuide[key].length) return;
+  foodGuide[key].splice(idx, 1);
+  saveLocal();
+  renderLP();
+}
+
+function renderRoadToHana(body) {
+  let html = '<div class="ag-section ag-hana"><h3 class="ag-h">🛤 Road to Hana - Stop Order</h3><ol class="ag-hana-list">';
+  roadToHana.forEach((stop, i) => {
+    html += `<li class="ag-hana-item">
+      <div class="ag-hana-title" onclick="toggleHanaConfirmed(${i})" title="Click to toggle confirmed">${i+1}. ${esc(stop.name)}${stop.confirmed ? ' <span class="ag-check">✓</span>' : ''}</div>
+      ${stop.desc ? `<div class="ag-hana-desc">${esc(stop.desc)}</div>` : ''}
+      <button class="ag-remove ag-remove-hana" onclick="event.stopPropagation();removeHanaStop(${i})" title="Remove">×</button>
+    </li>`;
+  });
+  html += '</ol><div class="ag-add ag-add-hana" onclick="addHanaStop()">+ Add stop</div></div>';
+  body.innerHTML = html;
+}
+
+function addHanaStop() {
+  const name = prompt('Stop name (e.g. Twin Falls)');
+  if (!name || !name.trim()) return;
+  const desc = prompt('Details (e.g. Mile 2. $10 parking. ~45 min)') || '';
+  roadToHana.push({ name: name.trim(), desc: desc.trim(), confirmed: false });
+  saveLocal();
+  renderLP();
+}
+
+function removeHanaStop(idx) {
+  if (idx < 0 || idx >= roadToHana.length) return;
+  roadToHana.splice(idx, 1);
+  saveLocal();
+  renderLP();
+}
+
+function toggleHanaConfirmed(idx) {
+  if (!roadToHana[idx]) return;
+  roadToHana[idx].confirmed = !roadToHana[idx].confirmed;
+  saveLocal();
+  renderLP();
 }
 
 function tagEmoji(tag) {
@@ -1174,7 +1310,7 @@ function saveListNote(id) {
 //  SELECT ACTIVITY (click from list OR map pin)
 // ══════════════════════════════════════════════════════════════
 function selectActivity(id) {
-  if (!id || !acts[id]) { console.warn('selectActivity: not found', id); return; }
+  if (!id || !acts[id]) return;
   // Highlight in list
   document.querySelectorAll('.li').forEach(el => el.classList.remove('active'));
   const liEl = document.getElementById(`li-${id}`);
@@ -1190,9 +1326,10 @@ function openDP(id) {
   if (!acts[id]) return;
   curId = id;
   const a = acts[id];
+  const dayFilter = (curDay === 'all' || curDay === 'food' || curDay === 'hana');
   visIds = Object.values(acts)
-    .filter(x => curDay === 'all' || x.day === curDay)
-    .sort((x,y) => x.day < y.day ? -1 : x.day > y.day ? 1 : toMin(x.time) - toMin(y.time))
+    .filter(x => dayFilter || x.day === curDay)
+    .sort((x,y) => (x.day||'').localeCompare(y.day||'') || toMin(x.time) - toMin(y.time))
     .map(x => x.id);
   const i = visIds.indexOf(id);
   document.getElementById('dp-ctr').textContent = `${i+1} of ${visIds.length}`;
@@ -1210,7 +1347,8 @@ function renderDPBody(a) {
   const col = DC[a.day] || '#7eb8da';
   const apprvs = a.approvals || {};
   const approved = Object.entries(apprvs).filter(([,v]) => v).map(([k]) => k);
-  const need = travelers.filter(t => t.trim()).length || 5;
+  const total = travelers.filter(t => t.trim()).length || 5;
+  const need = Math.ceil(total / 2);
   const full = approved.length >= need;
   const myOk = curUser && apprvs[curUser] === true;
   const pct = Math.min(100, Math.round((approved.length / need) * 100));
@@ -1239,11 +1377,11 @@ function renderDPBody(a) {
     </div>
 
     ${sugg ? `<div class="sec">
-      <div class="sec-h">Group Approval — ${approved.length}/${need} needed</div>
+      <div class="sec-h">Group Approval — ${approved.length}/${need} (majority of ${total})</div>
       <div class="av-box">
         <div class="av-bar-r"><div class="av-bar"><div class="av-fill" style="width:${pct}%"></div></div><span class="av-ct">${approved.length}/${need}</span></div>
         ${approved.length ? `<div class="av-chips">${approved.map(n=>`<span class="av-chip">✓ ${esc(n)}</span>`).join('')}</div>` : ''}
-        ${full ? `<div class="av-full">🎉 Fully approved — added to itinerary!</div>`
+        ${full ? `<div class="av-full">🎉 Majority approved — added to itinerary!</div>`
                : myOk ? `<button class="av-btn done">✓ You approved this</button>`
                : `<button class="av-btn" onclick="doApprove('${a.id}')">👍 Approve this suggestion</button>`}
       </div>
@@ -1468,10 +1606,11 @@ function doApprove(id) {
   }
 }
 function checkFull(id, a) {
-  const need = travelers.filter(t=>t.trim()).length || 5;
+  const total = travelers.filter(t=>t.trim()).length || 5;
+  const need = Math.ceil(total / 2);
   const cnt = Object.values(a.approvals||{}).filter(Boolean).length;
   if (cnt >= need && a.status === 'suggestion') {
-    doUpdate(id, {status:'approved'}); toast('🎉 Fully approved — added to the itinerary!');
+    doUpdate(id, {status:'approved'}); toast('🎉 Majority approved — added to the itinerary!');
   }
 }
 
@@ -1592,15 +1731,15 @@ function doPick(ll) { doUpdate(pickTarget, {lat:ll.lat,lng:ll.lng}); endPick(); 
 // ══════════════════════════════════════════════════════════════
 function showNamePicker() {
   document.getElementById('nm-grid').innerHTML = travelers.filter(t=>t.trim()).map(t =>
-    `<div class="nm-opt ${curUser===t?'sel':''}" onclick="pickNm(this,'${t}')">${t}</div>`
+    `<div class="nm-opt ${curUser===t?'sel':''}" data-name="${esc(t)}" onclick="pickNm(this)">${esc(t)}</div>`
   ).join('');
   document.getElementById('nm-custom').value = curUser || '';
   document.getElementById('nm-ov').classList.add('open');
 }
-function pickNm(el, name) {
+function pickNm(el) {
   document.querySelectorAll('.nm-opt').forEach(e=>e.classList.remove('sel'));
   el.classList.add('sel');
-  document.getElementById('nm-custom').value = name;
+  document.getElementById('nm-custom').value = el.dataset.name || '';
 }
 function setName() {
   const n = document.getElementById('nm-custom').value.trim();
@@ -1676,9 +1815,8 @@ document.addEventListener('DOMContentLoaded', function() {
   if (fbOk) { setupFBListeners(); }
   else if (FIREBASE_CONFIG.apiKey !== 'YOUR_API_KEY') { localMode=true; loadLocal(); }
 
-  ['act-ov','cfg-ov'].forEach(function(id) {
-    document.getElementById(id).addEventListener('click', function(e) { if(e.target===this) this.classList.remove('open'); });
-  });
+  document.getElementById('act-ov').addEventListener('click', function(e) { if(e.target===this) closeActOv(); });
+  document.getElementById('cfg-ov').addEventListener('click', function(e) { if(e.target===this) closeCfg(); });
   document.getElementById('nm-ov').addEventListener('click', function(e) {
     if (e.target===this && curUser) this.classList.remove('open');
   });
