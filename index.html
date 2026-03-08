@@ -1985,6 +1985,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (e.target===this && curUser) this.classList.remove('open');
   });
   setupSwipeRows();
+  if (window.innerWidth <= 720) setMobileView('schedule');
 });
 
 function setupSwipeRows() {
@@ -2100,10 +2101,10 @@ function setMobileView(view) {
 
 <!-- Mobile: bottom tab bar + FAB -->
 <div id="mob-tabs">
-  <button class="mob-tab on" data-v="map" onclick="setMobileView('map')">
+  <button class="mob-tab" data-v="map" onclick="setMobileView('map')">
     <span class="mob-tab-icon">🗺</span>Map
   </button>
-  <button class="mob-tab" data-v="schedule" onclick="setMobileView('schedule')">
+  <button class="mob-tab on" data-v="schedule" onclick="setMobileView('schedule')">
     <span class="mob-tab-icon">📋</span>Schedule
   </button>
   <button class="mob-tab" data-v="food" onclick="setMobileView('food')">
