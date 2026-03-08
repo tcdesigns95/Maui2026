@@ -932,13 +932,44 @@ function dismissSetup() {
   localMode = true; loadLocal();
 }
 
+const FOOD_GUIDE_DEFAULTS = {
+  breakfast: [
+    'The Gazebo — banana mac nut pancakes (arrive early!)',
+    'Kihei Caffe — opens 6am, fast & local',
+    'Kihei Farmers Market — grab-and-go bites'
+  ],
+  lunch: [
+    'Paia Fish Market — fresh fish, casual',
+    'Monkeypod Kitchen — happy hour, great mai tais',
+    'OAO Sushi / Izakaya — sushi night',
+    "Isana's / Havens — local favorites",
+    "Papi's Ohana — easy group dinner"
+  ],
+  sweets: [
+    "Ululani's Shave Ice — 61 S Kihei Rd",
+    'Haupia Matcha — unique local treat',
+    "Sparky's & Zippy's — casual & fun",
+    'Foodland — grocery / snack runs'
+  ],
+  bookAsap: [
+    'Whale Watch Tour — sells out in March',
+    'Lahaina Sail Maui Sunset Sail',
+    'Haleakalā Sunrise (NPS reservation)',
+    "Waiʻānapanapa — already confirmed"
+  ]
+};
+
 const HANA_DEFAULTS = [
-  { name:'Twin Falls', desc:'Mile 2. $10 parking. Waterfall hike. ~45 min' },
-  { name:'Garden of Eden Arboretum', desc:'Mile 10. $20. Botanical garden. ~1 hr' },
-  { name:'Keʻanae Peninsula', desc:'Mile 16. Lava coastline. ~30 min' },
-  { name:'Waiʻānapanapa State Park', desc:'Black sand beach. Reservations required.' },
-  { name:'Hana Town', desc:'Lunch stop. Food trucks & shops.' },
-  { name:'Wailua Falls', desc:'Mile 45. Famous waterfall. ~20 min' }
+  { name:'Leave Kihei', desc:'6:30 AM · Fill gas, pack towels, water, snacks & Dramamine' },
+  { name:'Twin Falls', desc:'7:15 AM · Mile 2. $10 parking. Waterfall hike ~30 min' },
+  { name:'Rainbow Eucalyptus Trees', desc:'8:00 AM · Mile 7. Free roadside stop on the LEFT' },
+  { name:'Garden of Eden Arboretum', desc:'8:30 AM · Mile 10. $20/person. Best bathrooms + ocean views. ~45 min' },
+  { name:"Keʻanae — Auntie Sandy's 🍌", desc:'10:30 AM · Mile 14. Famous banana bread — CASH ONLY' },
+  { name:"Pua'a Ka'a Falls", desc:'12:00 PM · Mile 22. Free roadside waterfall with swim spot. ~20 min' },
+  { name:'Nahiku Marketplace', desc:'12:45 PM · Mile 25. Snacks & fresh fruit. Grab lunch here' },
+  { name:"Waiʻānapanapa Black Sand Beach", desc:'2:30 PM · Mile 32. RESERVATION REQUIRED. ~1.5 hrs' },
+  { name:'Wailua Falls / Venus Pools', desc:'4:00 PM · Mile 34+. Optional if time allows' },
+  { name:"Return — Dinner: Zippy's", desc:"7:30 PM · Back to Kihei ~5:30 PM. Hawaii comfort food" }
 ];
 
 function loadLocal() {
@@ -948,8 +979,10 @@ function loadLocal() {
   const rth = localStorage.getItem('mw_roadToHana');
   if (st) { try { travelers = JSON.parse(st); } catch(e){} }
   if (fg) { try { foodGuide = JSON.parse(fg); } catch(e){} }
+  const fgEmpty = !(foodGuide.breakfast?.length || foodGuide.lunch?.length || foodGuide.sweets?.length || foodGuide.bookAsap?.length);
+  if (fgEmpty) foodGuide = JSON.parse(JSON.stringify(FOOD_GUIDE_DEFAULTS));
   if (rth) { try { roadToHana = JSON.parse(rth); } catch(e){} }
-  if (!roadToHana.length) roadToHana = HANA_DEFAULTS.map((h,i)=>({...h, confirmed:i===3}));
+  if (!roadToHana.length) roadToHana = HANA_DEFAULTS.map((h,i)=>({...h, confirmed:i===7}));
   if (sv) { try { acts = JSON.parse(sv); } catch(e) { acts = {}; } }
   if (!Object.keys(acts).length) {
     SEED.forEach(s => { acts[s.id] = {...s, status:'approved', approvals:{}, notes:{}}; });
