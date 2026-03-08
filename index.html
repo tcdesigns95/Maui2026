@@ -179,32 +179,28 @@
 
     .sugg-badge { font-size: 0.58em; background: rgba(224,122,95,0.2); color: var(--coral); border: 1px solid rgba(224,122,95,0.4); border-radius: 6px; padding: 1px 5px; font-weight: 700; }
 
-    /* ── ACTIVITY GUIDE ── */
+    /* ── ACTIVITY GUIDE (schedule-style: lp-day-group) ── */
     .ag-section { padding: 4px 0; }
-    .ag-h { font-size: 0.9em; font-weight: 700; color: var(--teal); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
-    .ag-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .ag-panel { background: white; border-radius: 12px; padding: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow: hidden; }
-    .ag-panel-h { font-size: 0.78em; font-weight: 700; color: #1a1a1a; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
     .ag-list { list-style: none; padding: 0; margin: 0; }
-    .ag-item { display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px dashed rgba(0,0,0,0.1); font-size: 0.8em; color: #333; }
-    .ag-item:last-of-type { border-bottom: none; }
+    .lp-day-body .ag-item {
+      display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px;
+      border-bottom: 1px solid rgba(0,0,0,0.08); font-size: 0.8em; color: #333;
+      background: white; transition: background .15s;
+    }
+    .lp-day-body .ag-item:last-child { border-bottom: none; }
+    .lp-day-body .ag-item:hover { background: rgba(0,0,0,0.02); }
     .ag-bullet { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); flex-shrink: 0; margin-top: 6px; }
     .ag-item-txt { flex: 1; line-height: 1.4; }
     .ag-remove { width: 22px; height: 22px; border-radius: 50%; background: rgba(239,68,68,0.15); border: none; color: #dc2626; font-size: 1em; cursor: pointer; flex-shrink: 0; line-height: 1; display: flex; align-items: center; justify-content: center; }
     .ag-remove:hover { background: rgba(239,68,68,0.25); }
-    .ag-add { margin-top: 10px; padding: 10px; border: 1px dashed rgba(20,184,166,0.5); border-radius: 8px; font-size: 0.78em; color: var(--teal); cursor: pointer; text-align: center; font-weight: 600; transition: background .15s; }
-    .ag-add:hover { background: rgba(20,184,166,0.06); }
     .ag-hana-list { list-style: none; padding: 0; margin: 0; counter-reset: hana; }
-    .ag-hana-item { position: relative; padding: 14px 36px 14px 0; border-bottom: 1px solid rgba(0,0,0,0.08); }
-    .ag-hana-item:last-of-type { border-bottom: none; }
-    .ag-hana-title { font-size: 0.9em; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
+    .ag-hana-item { position: relative; padding: 10px 36px 10px 12px; border-bottom: 1px solid rgba(0,0,0,0.08); background: white; transition: background .15s; }
+    .ag-hana-item:last-child { border-bottom: none; }
+    .ag-hana-item:hover { background: rgba(0,0,0,0.02); }
+    .ag-hana-title { font-size: 0.85em; font-weight: 700; color: #1a1a1a; margin-bottom: 2px; cursor: pointer; }
     .ag-hana-desc { font-size: 0.78em; color: #555; line-height: 1.4; }
     .ag-check { color: #22c55e; font-weight: 700; }
-    .ag-hana-title { cursor: pointer; }
-    .ag-remove-hana { position: absolute; top: 50%; right: 0; transform: translateY(-50%); }
-    .ag-add-hana { margin-top: 16px; }
-
-    @media (max-width: 480px) { .ag-grid { grid-template-columns: 1fr; } }
+    .ag-remove-hana { position: absolute; top: 50%; right: 12px; transform: translateY(-50%); }
 
     /* ── MAP WRAPPER ── */
     #mw-r { flex: 1; position: relative; overflow: hidden; }
@@ -1268,23 +1264,25 @@ function renderLP() {
 
 function renderFoodGuide(body) {
   const panels = [
-    { key:'breakfast', title:'Breakfast & Brunch', icon:'☕' },
-    { key:'lunch', title:'Lunch & Dinner', icon:'🐟' },
-    { key:'sweets', title:'Sweets & Snacks', icon:'🍦' },
-    { key:'bookAsap', title:'Book These ASAP', icon:'🚀' }
+    { key:'breakfast', title:'Breakfast & Brunch', icon:'☕', color:'#0ea5e9' },
+    { key:'lunch', title:'Lunch & Dinner', icon:'🐟', color:'#14b8a6' },
+    { key:'sweets', title:'Sweets & Snacks', icon:'🍦', color:'#f97316' },
+    { key:'bookAsap', title:'Book These ASAP', icon:'🚀', color:'#a855f7' }
   ];
-  let html = '<div class="ag-section"><h3 class="ag-h">🍴 Full Food Guide</h3><div class="ag-grid">';
+  let html = '<div class="ag-section">';
   panels.forEach(p => {
     const items = foodGuide[p.key] || [];
-    html += `<div class="ag-panel">
-      <h4 class="ag-panel-h">${p.icon} ${p.title}</h4>
-      <ul class="ag-list">`;
+    html += `<div class="lp-day-group">
+      <div class="lp-day-hd" style="background:${p.color};color:white">${p.icon} ${p.title}</div>
+      <div class="lp-day-body"><ul class="ag-list">`;
     items.forEach((item, i) => {
       html += `<li class="ag-item"><span class="ag-bullet"></span><span class="ag-item-txt">${esc(item)}</span><button class="ag-remove" onclick="removeFoodItem('${p.key}',${i})" title="Remove">×</button></li>`;
     });
-    html += `</ul><div class="ag-add" onclick="addFoodItem('${p.key}')">+ Add item</div></div>`;
+    html += `</ul></div>
+      <div class="lp-day-add-row" onclick="addFoodItem('${p.key}')">+ Add item</div>
+    </div>`;
   });
-  html += '</div></div>';
+  html += '</div>';
   body.innerHTML = html;
 }
 
@@ -1307,7 +1305,10 @@ function removeFoodItem(key, idx) {
 }
 
 function renderRoadToHana(body) {
-  let html = '<div class="ag-section ag-hana"><h3 class="ag-h">🛤 Road to Hana - Stop Order</h3><ol class="ag-hana-list">';
+  let html = `<div class="ag-section ag-hana">
+    <div class="lp-day-group">
+      <div class="lp-day-hd" style="background:#22c55e;color:white">🛤 Road to Hana - Stop Order</div>
+      <div class="lp-day-body"><ol class="ag-hana-list">`;
   roadToHana.forEach((stop, i) => {
     html += `<li class="ag-hana-item">
       <div class="ag-hana-title" onclick="toggleHanaConfirmed(${i})" title="Click to toggle confirmed">${i+1}. ${esc(stop.name)}${stop.confirmed ? ' <span class="ag-check">✓</span>' : ''}</div>
@@ -1315,7 +1316,9 @@ function renderRoadToHana(body) {
       <button class="ag-remove ag-remove-hana" onclick="event.stopPropagation();removeHanaStop(${i})" title="Remove">×</button>
     </li>`;
   });
-  html += '</ol><div class="ag-add ag-add-hana" onclick="addHanaStop()">+ Add stop</div></div>';
+  html += `</ol></div>
+    <div class="lp-day-add-row" onclick="addHanaStop()">+ Add stop</div>
+  </div></div>`;
   body.innerHTML = html;
 }
 
