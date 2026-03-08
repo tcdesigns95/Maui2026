@@ -1975,7 +1975,8 @@ function setupSwipeRows() {
   const body = document.getElementById('lp-body');
   if (!body) return;
   const THRESH = 50;
-  let startX = 0, currentRow = null;
+  const MIN_MOVE = 15;
+  let startX = 0, currentRow = null, hasMoved = false;
 
   function getRow(el) {
     return el && el.closest ? el.closest('.swipe-row') : null;
@@ -1983,25 +1984,26 @@ function setupSwipeRows() {
   function closeAll() {
     body.querySelectorAll('.swipe-row.revealed').forEach(r => r.classList.remove('revealed'));
   }
-  function reveal(row) {
-    closeAll();
-    if (row) row.classList.add('revealed');
-  }
 
   body.addEventListener('touchstart', function(e) {
     const row = getRow(e.target);
     if (!row || e.target.closest('.swipe-btn')) return;
     startX = e.touches[0].clientX;
     currentRow = row;
+    hasMoved = false;
   }, { passive: true });
   body.addEventListener('touchmove', function(e) {
     if (!currentRow) return;
     const dx = e.touches[0].clientX - startX;
-    if (dx < -THRESH) currentRow.classList.add('revealed');
-    else if (dx > THRESH) currentRow.classList.remove('revealed');
+    if (Math.abs(dx) > MIN_MOVE) hasMoved = true;
+    if (hasMoved) {
+      if (dx < -THRESH) currentRow.classList.add('revealed');
+      else if (dx > THRESH) currentRow.classList.remove('revealed');
+    }
   }, { passive: true });
   body.addEventListener('touchend', function() {
     currentRow = null;
+    hasMoved = false;
   }, { passive: true });
 
   body.addEventListener('mousedown', function(e) {
@@ -2009,18 +2011,24 @@ function setupSwipeRows() {
     if (!row || e.target.closest('.swipe-btn')) return;
     startX = e.clientX;
     currentRow = row;
+    hasMoved = false;
   });
   body.addEventListener('mousemove', function(e) {
     if (!currentRow) return;
     const dx = e.clientX - startX;
-    if (dx < -THRESH) currentRow.classList.add('revealed');
-    else if (dx > THRESH) currentRow.classList.remove('revealed');
+    if (Math.abs(dx) > MIN_MOVE) hasMoved = true;
+    if (hasMoved) {
+      if (dx < -THRESH) currentRow.classList.add('revealed');
+      else if (dx > THRESH) currentRow.classList.remove('revealed');
+    }
   });
   body.addEventListener('mouseup', function() {
     currentRow = null;
+    hasMoved = false;
   });
   body.addEventListener('mouseleave', function() {
     currentRow = null;
+    hasMoved = false;
   });
 
   document.addEventListener('click', function(e) {
