@@ -1974,7 +1974,8 @@ document.addEventListener('DOMContentLoaded', function() {
 function setupSwipeRows() {
   const body = document.getElementById('lp-body');
   if (!body) return;
-  const THRESH = 50;
+  const THRESH_REVEAL = 50;
+  const THRESH_HIDE = 25;
   const MIN_MOVE = 15;
   let startX = 0, currentRow = null, hasMoved = false;
 
@@ -1987,7 +1988,7 @@ function setupSwipeRows() {
 
   body.addEventListener('touchstart', function(e) {
     const row = getRow(e.target);
-    if (!row || e.target.closest('.swipe-btn')) return;
+    if (!row) return;
     startX = e.touches[0].clientX;
     currentRow = row;
     hasMoved = false;
@@ -1997,8 +1998,8 @@ function setupSwipeRows() {
     const dx = e.touches[0].clientX - startX;
     if (Math.abs(dx) > MIN_MOVE) hasMoved = true;
     if (hasMoved) {
-      if (dx < -THRESH) currentRow.classList.add('revealed');
-      else if (dx > THRESH) currentRow.classList.remove('revealed');
+      if (dx < -THRESH_REVEAL) currentRow.classList.add('revealed');
+      else if (dx > THRESH_HIDE) currentRow.classList.remove('revealed');
     }
   }, { passive: true });
   body.addEventListener('touchend', function() {
@@ -2008,7 +2009,7 @@ function setupSwipeRows() {
 
   body.addEventListener('mousedown', function(e) {
     const row = getRow(e.target);
-    if (!row || e.target.closest('.swipe-btn')) return;
+    if (!row) return;
     startX = e.clientX;
     currentRow = row;
     hasMoved = false;
@@ -2018,8 +2019,8 @@ function setupSwipeRows() {
     const dx = e.clientX - startX;
     if (Math.abs(dx) > MIN_MOVE) hasMoved = true;
     if (hasMoved) {
-      if (dx < -THRESH) currentRow.classList.add('revealed');
-      else if (dx > THRESH) currentRow.classList.remove('revealed');
+      if (dx < -THRESH_REVEAL) currentRow.classList.add('revealed');
+      else if (dx > THRESH_HIDE) currentRow.classList.remove('revealed');
     }
   });
   body.addEventListener('mouseup', function() {
